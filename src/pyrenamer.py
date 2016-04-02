@@ -165,10 +165,10 @@ class pyRenamer:
         
         # Get defined signals
         signals = { "on_main_window_destroy": self.on_main_quit,
-                    #"on_main_window_window_state_event": self.on_main_window_window_state_event,
+                    "on_main_window_window_state_event": self.on_main_window_window_state_event,
                     "on_main_window_configure_event": self.on_main_window_configure_event,
                     "on_main_hpaned_notify": self.on_main_hpaned_notify,
-
+                    "on_manual_changed": self.on_manual_changed,
                     "on_file_pattern_changed": self.on_file_pattern_changed,
                     "on_original_pattern_changed": self.on_original_pattern_changed,
                     "on_renamed_pattern_changed": self.on_renamed_pattern_changed,
@@ -178,23 +178,19 @@ class pyRenamer:
                     "on_pattern_dest_edit_clicked": self.on_pattern_dest_edit_clicked,
                     "on_original_pattern_combo_changed": self.on_original_pattern_combo_changed,
                     "on_renamed_pattern_combo_changed": self.on_renamed_pattern_combo_changed,
-
                     "on_preview_button_clicked": self.on_preview_button_clicked,
                     "on_clean_button_clicked": self.on_clean_button_clicked,
                     "on_rename_button_clicked": self.on_rename_button_clicked,
                     "on_exit_button_clicked": self.on_main_quit,
-
                     "on_options_button_clicked": self.on_options_button_clicked,
-                    #"on_add_recursive_toggled": self.prefs.on_add_recursive_toggled,
-                    #"on_filedir_combo_changed": self.prefs.on_filedir_combo_changed,
-                    #"on_extensions_check_toggled": self.prefs.on_extensions_check_toggled,
-                    #"on_autopreview_check_toggled": self.prefs.on_autopreview_check_toggled,
-
+                    "on_add_recursive_toggled": self.prefs.on_add_recursive_toggled,
+                    "on_filedir_combo_changed": self.prefs.on_filedir_combo_changed,
+                    "on_extensions_check_toggled": self.prefs.on_extensions_check_toggled,
+                    "on_autopreview_check_toggled": self.prefs.on_autopreview_check_toggled,
                     "on_menu_preview_activate": self.on_preview_button_clicked,
                     "on_menu_rename_activate": self.on_rename_button_clicked,
                     "on_menu_load_names_from_file_activate": self.on_menu_load_names_from_file_activate,
                     "on_menu_clear_preview_activate": self.on_clean_button_clicked,
-
                     "on_menu_undo_activate": self.menu_cb.on_menu_undo_activate,
                     "on_menu_redo_activate": self.menu_cb.on_menu_redo_activate,
                     "on_cut_activate": self.on_cut_activate,
@@ -204,7 +200,6 @@ class pyRenamer:
                     "on_select_all_activate": self.on_select_all_activate,
                     "on_select_nothing_activate": self.on_select_nothing_activate,
                     "on_preferences_activate": self.on_preferences_activate,
-
                     "on_menu_refresh_activate": self.menu_cb.on_menu_refresh_activate,
                     "on_menu_patterns_activate": self.menu_cb.on_menu_patterns_activate,
                     "on_menu_substitutions_activate": self.menu_cb.on_menu_substitutions_activate,
@@ -213,7 +208,6 @@ class pyRenamer:
                     "on_menu_images_activate": self.menu_cb.on_menu_images_activate,
                     "on_menu_music_activate": self.menu_cb.on_menu_music_activate,
                     "on_menu_show_options_activate": self.menu_cb.on_menu_show_options_activate,
-
                     "on_subs_spaces_toggled": self.on_subs_spaces_toggled,
                     "on_subs_capitalization_toggled": self.on_subs_capitalization_toggled,
                     "on_subs_spaces_combo_changed": self.on_subs_spaces_combo_changed,
@@ -223,16 +217,13 @@ class pyRenamer:
                     "on_subs_replace_new_changed": self.on_subs_replace_new_changed,
                     "on_subs_accents_toggled": self.on_subs_accents_toggled,
                     "on_subs_duplicated_toggled": self.on_subs_duplicated_toggled,
-
                     "on_insert_radio_toggled": self.on_insert_radio_toggled,
                     "on_insert_entry_changed": self.on_insert_entry_changed,
                     "on_insert_pos_changed": self.on_insert_pos_changed,
                     "on_insert_end_toggled": self.on_insert_end_toggled,
-
                     "on_delete_radio_toggled": self.on_delete_radio_toggled,
                     "on_delete_from_changed": self.on_delete_from_changed,
                     "on_delete_to_changed": self.on_delete_to_changed,
-
                     "on_images_original_pattern_changed": self.on_images_original_pattern_changed,
                     "on_images_renamed_pattern_changed": self.on_images_renamed_pattern_changed,
                     "on_images_ori_save_clicked": self.on_images_ori_save_clicked,
@@ -241,7 +232,6 @@ class pyRenamer:
                     "on_images_dest_edit_clicked": self.on_images_dest_edit_clicked,
                     "on_images_original_pattern_combo_changed": self.on_images_original_pattern_combo_changed,
                     "on_images_renamed_pattern_combo_changed": self.on_images_renamed_pattern_combo_changed,
-
                     "on_music_original_pattern_changed": self.on_music_original_pattern_changed,
                     "on_music_renamed_pattern_changed": self.on_music_renamed_pattern_changed,
                     "on_music_ori_save_clicked": self.on_music_ori_save_clicked,
@@ -250,15 +240,11 @@ class pyRenamer:
                     "on_music_dest_edit_clicked": self.on_music_dest_edit_clicked,
                     "on_music_original_pattern_combo_changed": self.on_music_original_pattern_combo_changed,
                     "on_music_renamed_pattern_combo_changed": self.on_music_renamed_pattern_combo_changed,
-
                     "on_menu_quit_activate": self.on_main_quit,
                     "on_menu_about_activate": self.about_info,
-
                     "on_notebook_switch_page": self.on_notebook_switch_page,
-
                     "on_manual_key_press_event": self.on_manual_key_press_event,
                     "on_quit_button_clicked": self.on_main_quit }
-
         self.builder.connect_signals(signals)
 
         # Create ProgressBar and add it to the StatusBar. Add also a Stop icon
@@ -302,9 +288,6 @@ class pyRenamer:
         # Add dirs and files tomain window
         self.builder.get_object('main_hpaned').pack1(file_browser_scrolled, resize=True, shrink=False)
         self.builder.get_object('main_hpaned').pack2(selected_files_scrolled, resize=True, shrink=False)
-
-        # # Add signal for manual entry changed
-        # self.manual_signal = self.manual.connect("changed", self.on_manual_changed)
 
         # Create model and add dirs
         self.create_model()
@@ -606,15 +589,15 @@ class pyRenamer:
         self.populate_stop()
 
 
-    #def on_main_window_window_state_event(self, window, event):
-    #    """ Thrown when window is maximized or demaximized """
-    #    if event.changed_mask & Gtk.gdk.WINDOW_STATE_MAXIMIZED:
-    #        if event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED:
-    #            self.window_maximized = True
-    #            self.builder.get_object('statusbar').set_has_resize_grip(False)
-    #        else:
-    #            self.window_maximized = False
-    #            self.builder.get_object('statusbar').set_has_resize_grip(True)
+    def on_main_window_window_state_event(self, window, event):
+        """ Thrown when window is maximized or demaximized """
+        if event.changed_mask & Gtk.gdk.WINDOW_STATE_MAXIMIZED:
+            if event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED:
+                self.window_maximized = True
+                self.builder.get_object('statusbar').set_has_resize_grip(False)
+            else:
+                self.window_maximized = False
+                self.builder.get_object('statusbar').set_has_resize_grip(True)
 
 
     def on_main_window_configure_event(self, window, event):

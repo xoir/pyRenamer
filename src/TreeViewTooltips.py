@@ -92,36 +92,9 @@ pointer leaves the cell (or column, or row, or view, depending on how
 get_tooltip() is implemented).
 
 '''
-
-
-# import pygtk
-# pygtk.require('2.0')
-
-# import gtk
-# import gtk.gdk
-# import gobject
-
-# if gtk.gtk_version < (2, 8):
-#     import warnings
-
-#     msg = ('''This module was developed and tested with version 2.8.18 of gtk.  You are using version %d.%d.%d.  Your milage may vary.'''
-#            % gtk.gtk_version)
-#     warnings.warn(msg)
-
-try:
-    from gi import pygtkcompat
-except ImportError:
-    pygtkcompat = None
-
-if pygtkcompat is not None:
-    pygtkcompat.enable() 
-    pygtkcompat.enable_gtk(version='3.0')
-
-import gtk
-import gtk.gdk
-import gobject
-
-
+import gi 
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
     
 # major, minor, patch
 version = 1, 0, 0
@@ -146,7 +119,7 @@ class TreeViewTooltips:
         '''
 
         # create the window
-        self.window = window = gtk.Window(gtk.WINDOW_POPUP)
+        self.window = window = Gtk.Window(Gtk.WINDOW_POPUP)
         window.set_name('gtk-tooltips')
         window.set_resizable(False)
         window.set_border_width(4)
@@ -155,7 +128,7 @@ class TreeViewTooltips:
 
 
         # create the label
-        self.label = label = gtk.Label()
+        self.label = label = Gtk.Label()
         label.set_line_wrap(True)
         label.set_alignment(0.5, 0.5)
         label.set_use_markup(True)
@@ -276,8 +249,8 @@ class TreeViewTooltips:
         # black border (default gtk Style).  This code is a
         # transliteration of the C implementation of gtk.Tooltips.
         w, h = window.size_request()
-        window.style.paint_flat_box(window.window, gtk.STATE_NORMAL,
-                                    gtk.SHADOW_OUT, None, window,
+        window.style.paint_flat_box(window.window, Gtk.STATE_NORMAL,
+                                    Gtk.SHADOW_OUT, None, window,
                                     'tooltip', 0, 0, w, h)
 
     def location(self, x, y, w, h):
@@ -296,7 +269,7 @@ class TreeViewTooltips:
 
         'add a gtk.TreeView to the tooltip'
         
-        assert isinstance(view, gtk.TreeView), \
+        assert isinstance(view, Gtk.TreeView), \
                ('This handler should only be connected to '
                 'instances of gtk.TreeView')
 
