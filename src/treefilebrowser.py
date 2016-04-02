@@ -21,18 +21,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
-try:
-    import pygtk
-    pygtk.require('2.0')
-except:
-      print "PyGtk 2.0 or later required for this app to run"
-      raise SystemExit
+# try:
+#     import pygtk
+#     pygtk.require('2.0')
+# except:
+#       print "PyGtk 2.0 or later required for this app to run"
+#       raise SystemExit
+
+# try:
+#     import gtk
+#     import gobject
+# except:
+#     raise SystemExit
 
 try:
-    import gtk
-    import gobject
-except:
-    raise SystemExit
+    from gi import pygtkcompat
+except ImportError:
+    pygtkcompat = None
+
+if pygtkcompat is not None:
+    pygtkcompat.enable() 
+    pygtkcompat.enable_gtk(version='3.0')
+
+import gtk
+import gobject
+
 
 from gettext import gettext as _
 
@@ -220,7 +233,7 @@ class TreeFileBrowser(gobject.GObject):
 
     def set_cursor_on_first_row(self):
         model = self.view.get_model()
-        iter = model.get_iter_root()
+        iter = model.get_iter_first()
         path = model.get_path(iter)
         self.view.set_cursor(path)
 
@@ -241,7 +254,7 @@ class TreeFileBrowser(gobject.GObject):
 
         # Expand root
         model = self.view.get_model()
-        iter = model.get_iter_root()
+        iter = model.get_iter_first()
         path = model.get_path(iter)
         self.view.expand_row(path, False)
         iter = model.iter_children(iter)

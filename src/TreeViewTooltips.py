@@ -94,21 +94,35 @@ get_tooltip() is implemented).
 '''
 
 
-import pygtk
-pygtk.require('2.0')
+# import pygtk
+# pygtk.require('2.0')
+
+# import gtk
+# import gtk.gdk
+# import gobject
+
+# if gtk.gtk_version < (2, 8):
+#     import warnings
+
+#     msg = ('''This module was developed and tested with version 2.8.18 of gtk.  You are using version %d.%d.%d.  Your milage may vary.'''
+#            % gtk.gtk_version)
+#     warnings.warn(msg)
+
+try:
+    from gi import pygtkcompat
+except ImportError:
+    pygtkcompat = None
+
+if pygtkcompat is not None:
+    pygtkcompat.enable() 
+    pygtkcompat.enable_gtk(version='3.0')
 
 import gtk
 import gtk.gdk
 import gobject
 
-if gtk.gtk_version < (2, 8):
-    import warnings
 
-    msg = ('''This module was developed and tested with version 2.8.18 of gtk.  You are using version %d.%d.%d.  Your milage may vary.'''
-           % gtk.gtk_version)
-    warnings.warn(msg)
-
-
+    
 # major, minor, patch
 version = 1, 0, 0
 

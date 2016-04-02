@@ -266,7 +266,12 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     pattern = pattern.replace('{X}', '([\S\s]*)')
     pattern = pattern.replace('{@}', '(.*)')
 
-    repattern = re.compile(pattern)
+    try:
+        repattern = re.compile(pattern)
+    except:
+        print('Error: could not compile pattern')
+        return None, None
+        
     try:
         groups = repattern.search(name).groups()
 

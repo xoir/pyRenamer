@@ -20,25 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
-try:
-    import pygtk
-    pygtk.require('2.0')
-except:
-      print "PyGtk 2.0 or later required for this app to run"
-      raise SystemExit
-
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-except:
-    raise SystemExit
-
-try:
-    import gconf
-    HAS_GCONF = True
-except:
-    HAS_GCONF = False
+import gi 
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import GObject
 
 from os import path as ospath
 
@@ -65,21 +50,21 @@ class PyrenamerPrefs:
         self.gconf_filedir = self.gconf_path + '/filedir'
         self.gconf_keepext = self.gconf_path + '/keepext'
         self.gconf_autopreview  = self.gconf_path + '/autopreview'
-
+        
 
     def create_preferences_dialog(self):
         """ Create Preferences dialog and connect signals """
-
         # Create the window
-        self.preferences_tree = gtk.glade.XML(pyrenamerglob.gladefile, "prefs_window")
-
-        # Get text entries and buttons
-        self.prefs_window = self.preferences_tree.get_widget('prefs_window')
-        self.prefs_entry_root = self.preferences_tree.get_widget('prefs_entry_root')
-        self.prefs_entry_active = self.preferences_tree.get_widget('prefs_entry_active')
-        self.prefs_browse_root = self.preferences_tree.get_widget('prefs_browse_root')
-        self.prefs_browse_active = self.preferences_tree.get_widget('prefs_browse_active')
-        self.prefs_close = self.preferences_tree.get_widget('prefs_close')
+        gui_objects = [
+            'prefs_window',
+            'prefs_entry_root',
+            'prefs_entry_active',
+            'prefs_browse_root',
+            'prefs_browse_active',
+            'prefs_close'
+            ]
+        self.builder = Gtk.Builder()
+        self.builder.add_objects_from_file(pyrenamerglob.gladefile, gui_objects)
 
         # Signals
         signals = {
@@ -88,51 +73,52 @@ class PyrenamerPrefs:
                    "on_prefs_close_clicked": self.on_prefs_close_clicked,
                    "on_prefs_window_destroy": self.on_prefs_destroy,
                    }
-        self.preferences_tree.signal_autoconnect(signals)
+        self.builder.connect_signals(signals)
 
-        # Fill the panel with gconf values or actual values (if gconf is empty)
         client = gconf.client_get_default()
         root_dir = client.get_string(self.gconf_root_dir)
         if root_dir == (None or ''): root_dir = self.main.root_dir
         active_dir = client.get_string(self.gconf_active_dir)
         if active_dir == (None or ''): active_dir = self.main.active_dir
-        self.prefs_entry_root.set_text(root_dir)
-        self.prefs_entry_active.set_text(active_dir)
+        self.builder.get_object('prefs_entry_root').set_text(root_dir)
+        self.builder.get_object('prefs_entry_active').set_text(active_dir)
 
         # Set prefs window icon
-        self.prefs_window.set_icon_from_file(pyrenamerglob.icon)
+        self.builder.get_object('prefs_window').set_icon_from_file(pyrenamerglob.icon)
 
 
+
+        
     def on_prefs_browse_root_clicked(self, widget):
         """ Browse root clicked """
-        f = gtk.FileChooserDialog(_('Select root directory'),
-                                  self.prefs_window,
-                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT),
+        f = Gtk.FileChooserDialog(_('Select root directory'),
+                                  self.builder.get_object('prefs_window'),
+                                  Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                  (Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT,
+                                   Gtk.STOCK_OK, Gtk.RESPONSE_ACCEPT),
                                    )
-        f.set_current_folder(self.prefs_entry_root.get_text())
+        f.set_current_folder(self.builder.get_object('prefs_entry_root').get_text())
         response = f.run()
-        if response == gtk.RESPONSE_ACCEPT:
-            self.prefs_entry_root.set_text(f.get_filename())
-        elif response == gtk.RESPONSE_REJECT:
+        if response == Gtk.RESPONSE_ACCEPT:
+            self.builder.get_object('prefs_entry_root').set_text(f.get_filename())
+        elif response == Gtk.RESPONSE_REJECT:
             pass
         f.destroy()
 
 
     def on_prefs_browse_active_clicked(self, widget):
         """ Browse active clicked """
-        f = gtk.FileChooserDialog(_('Select active directory'),
-                                  self.prefs_window,
-                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT),
+        f = Gtk.FileChooserDialog(_('Select active directory'),
+                                  self.builder.get_object('prefs_window'),
+                                  Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                  (Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT,
+                                   Gtk.STOCK_OK, Gtk.RESPONSE_ACCEPT),
                                    )
-        f.set_current_folder(self.prefs_entry_active.get_text())
+        f.set_current_folder(self.builder.get_object('prefs_entry_active').get_text())
         response = f.run()
-        if response == gtk.RESPONSE_ACCEPT:
-            self.prefs_entry_active.set_text(f.get_filename())
-        elif response == gtk.RESPONSE_REJECT:
+        if response == Gtk.RESPONSE_ACCEPT:
+            self.builder.get_object('prefs_entry_active').set_text(f.get_filename())
+        elif response == Gtk.RESPONSE_REJECT:
             pass
         f.destroy()
 
@@ -140,50 +126,49 @@ class PyrenamerPrefs:
     def on_prefs_close_clicked(self, widget):
         """ Prefs close button clicked """
 
-        root = self.prefs_entry_root.get_text()
-        active = self.prefs_entry_active.get_text()
+        root = self.builder.get_object('prefs_entry_root').get_text()
+        active = self.builder.get_object('prefs_entry_active').get_text()
         if root != "" and active != "":
             if not self.check_root_dir(root):
                 self.display_error_dialog(_("\nThe root directory is not valid!\nPlease select another directory."))
-                self.prefs_entry_root.set_text('/')
+                self.builder.get_object('prefs_entry_root').set_text('/')
             elif not self.check_active_dir(root, active):
                 self.main.display_error_dialog(_("\nThe active directory is not valid!\nPlease select another directory."))
-                self.prefs_entry_active.set_text(root)
+                self.builder.get_object('prefs_entry_active').set_text(root)
             else:
                 self.main.root_dir = root
                 self.main.active_dir = active
-                self.prefs_window.destroy()
+                self.builder.get_object('prefs_window').destroy()
                 self.preferences_save_dirs()
         else:
             self.main.display_error_dialog(_("\nPlease set both directories!"))
-            if root == '': self.prefs_entry_root.set_text(self.main.root_dir)
-            if active == '': self.prefs_entry_active.set_text(self.main.active_dir)
+            if root == '': self.builder.get_object('prefs_entry_root').set_text(self.main.root_dir)
+            if active == '': self.builder.get_object('prefs_entry_active').set_text(self.main.active_dir)
 
 
     def on_prefs_destroy(self, widget):
         """ Prefs window destroyed """
-
-        root = self.prefs_entry_root.get_text()
-        active = self.prefs_entry_active.get_text()
+        root = self.builder.get_object('prefs_entry_root').get_text()
+        active = self.builder.get_object('prefs_entry_active').get_text()
         if root != "" and active != "":
             if not self.check_root_dir(root):
                 self.main.display_error_dialog(_("\nThe root directory is not valid!\nPlease select another directory."))
                 self.create_preferences_dialog()
-                self.prefs_entry_root.set_text('/')
+                self.builder.get_object('prefs_entry_root').set_text('/')
             elif not self.check_active_dir(root, active):
                 self.main.display_error_dialog(_("\nThe active directory is not valid!\nPlease select another directory."))
                 self.create_preferences_dialog()
-                self.prefs_entry_active.set_text(root)
+                self.builder.get_object('prefs_entry_active').set_text(root)
             else:
                 self.main.root_dir = root
                 self.main.active_dir = active
-                self.prefs_window.destroy()
+                self.builder.get_object('prefs_window').destroy()
                 self.preferences_save_dirs()
         else:
             self.main.display_error_dialog(_("\nPlease set both directories!"))
             self.create_preferences_dialog()
-            if root == '': self.prefs_entry_root.set_text(self.main.root_dir)
-            if active == '': self.prefs_entry_active.set_text(self.main.active_dir)
+            if root == '': self.builder.get_object('prefs_entry_root').set_text(self.main.root_dir)
+            if active == '': self.builder.get_object('prefs_entry_active').set_text(self.main.active_dir)
 
 
     def on_add_recursive_toggled(self, widget):
