@@ -25,38 +25,6 @@ import os.path
 import user
 from os.path import dirname
 
-have_hachoir = True
-have_eyed3 = False
-
-# Check for hachoir_metadata
-try:
-    import hachoir_metadata
-except ImportError, e:
-    if str(e).find("hachoir_metadata") >= 0:
-          have_hachoir = False
-          print "WARNING: python-hachoir-metadata not found."
-except:
-    have_hachoir = False
-    print "WARNING: python-hachoir-metadata not found."
-
-# Check for eyed3
-if not have_hachoir:
-
-	# Check for eyeD3
-	have_eyed3 = True
-	try:
-	    import eyeD3
-	except ImportError, e:
-	    if str(e).find("eyeD3") >= 0:
-	          have_eyed3 = False
-	          print "WARNING: python-eyed3 not found."
-	except:
-	    have_eyed3 = False
-	    print "WARNING: python-eyed3 not found."
-
-if not (have_hachoir or have_eyed3):
-	print "WARNING: Music rename disabled!"
-
 pixmaps_dir = "@RESOURCEDIR@"
 resources_dir = "@RESOURCEDIR@"
 locale_dir = "@LOCALEDIR@"

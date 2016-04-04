@@ -21,31 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
-# try:
-#     import pygtk
-#     pygtk.require('2.0')
-# except:
-#       print "PyGtk 2.0 or later required for this app to run"
-#       raise SystemExit
-
-# try:
-#     import gtk
-#     import gobject
-# except:
-#     raise SystemExit
-
-try:
-    from gi import pygtkcompat
-except ImportError:
-    pygtkcompat = None
-
-if pygtkcompat is not None:
-    pygtkcompat.enable() 
-    pygtkcompat.enable_gtk(version='3.0')
-
-import gtk
-import gobject
-
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from gettext import gettext as _
 
@@ -55,29 +33,29 @@ try:
 except:
     raise SystemExit
 
-class TreeFileBrowser(gobject.GObject):
+class TreeFileBrowser(GObject.GObject):
     """ A widget that implements a tree-like file browser, like the
     one used on Nautilus spatial view in list mode """
 
     __gproperties__ = {
-        'show-hidden': (gobject.TYPE_BOOLEAN, 'show hidden files',
-                        'show hidden files and folders', False, gobject.PARAM_READWRITE),
-        'show-only-dirs': (gobject.TYPE_BOOLEAN, 'show only directories',
-                           'show only directories, not files', True, gobject.PARAM_READWRITE),
-        'rules-hint': (gobject.TYPE_BOOLEAN, 'rules hint',
-                       'show rows background in alternate colors', True, gobject.PARAM_READWRITE),
-        'root': (gobject.TYPE_STRING, 'initial path',
-                 'initial path selected on tree browser', '/', gobject.PARAM_READWRITE)
+        'show-hidden': (GObject.TYPE_BOOLEAN, 'show hidden files',
+                        'show hidden files and folders', False, GObject.PARAM_READWRITE),
+        'show-only-dirs': (GObject.TYPE_BOOLEAN, 'show only directories',
+                           'show only directories, not files', True, GObject.PARAM_READWRITE),
+        'rules-hint': (GObject.TYPE_BOOLEAN, 'rules hint',
+                       'show rows background in alternate colors', True, GObject.PARAM_READWRITE),
+        'root': (GObject.TYPE_STRING, 'initial path',
+                 'initial path selected on tree browser', '/', GObject.PARAM_READWRITE)
     }
 
-    __gsignals__ = { 'row-expanded' : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_STRING,)),
-                     'cursor-changed' : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_STRING,))
+    __gsignals__ = { 'row-expanded' : (GObject.SignalFlags.RUN_LAST, None, (GObject.TYPE_STRING,)),
+                     'cursor-changed' : (GObject.SignalFlags.RUN_LAST, None, (GObject.TYPE_STRING,))
     }
 
     def __init__(self, root=None):
         """ Path is where we wan the tree initialized """
 
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
 
         self.show_hidden = False
         self.show_only_dirs = True
@@ -397,9 +375,9 @@ class TreeFileBrowser(gobject.GObject):
 
     def create_popup(self):
         """ Create popup menu for right click """
-        self.popup = gtk.Menu()
+        self.popup = Gtk.Menu()
 
-        self.hidden_check_menu = gtk.CheckMenuItem(_("Show hidden files"))
+        self.hidden_check_menu = Gtk.CheckMenuItem(_("Show hidden files"))
         self.hidden_check_menu.connect('toggled', self.show_hidden_toggled)
 
         self.popup.add(self.hidden_check_menu)
@@ -409,11 +387,11 @@ class TreeFileBrowser(gobject.GObject):
     def get_folder_closed_icon(self):
         """ Returns a pixbuf with the current theme closed folder icon """
 
-        icon_theme = gtk.icon_theme_get_default()
+        icon_theme = Gtk.IconTheme.get_default()
         try:
             icon = icon_theme.load_icon("gnome-fs-directory", 16, 0)
             return icon
-        except gobject.GError, exc:
+        except GObject.GError, exc:
             #print "Can't load icon", exc
             try:
                 icon = icon_theme.load_icon("gtk-directory", 16, 0)
@@ -426,11 +404,11 @@ class TreeFileBrowser(gobject.GObject):
     def get_folder_opened_icon(self):
         """ Returns a pixbuf with the current theme opened folder icon """
 
-        icon_theme = gtk.icon_theme_get_default()
+        icon_theme = Gtk.IconTheme.get_default()
         try:
             icon = icon_theme.load_icon("gnome-fs-directory-accept", 16, 0)
             return icon
-        except gobject.GError, exc:
+        except GObject.GError, exc:
             #print "Can't load icon", exc
             try:
                 icon = icon_theme.load_icon("gtk-directory", 16, 0)
@@ -443,11 +421,11 @@ class TreeFileBrowser(gobject.GObject):
     def get_file_icon(self):
         """ Returns a pixbuf with the current theme file icon """
 
-        icon_theme = gtk.icon_theme_get_default()
+        icon_theme = Gtk.IconTheme.get_default()
         try:
-            icon = icon_theme.load_icon("text-x-generic", gtk.ICON_SIZE_MENU, 0)
+            icon = icon_theme.load_icon("text-x-generic", Gtk.IconSize.MENU, 0)
             return icon
-        except gobject.GError, exc:
+        except GObject.GError, exc:
             #print "Can't load icon", exc
             return None
 
@@ -458,9 +436,9 @@ class TreeFileBrowser(gobject.GObject):
     def make_view(self):
         """ Create the view itself.
             (Icon, dir name, path) """
-        self.model = gtk.TreeStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.model = Gtk.TreeStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING, GObject.TYPE_STRING)
 
-        view = gtk.TreeView(self.model)
+        view = Gtk.TreeView(self.model)
         view.set_headers_visible(False)
         view.set_enable_search(True)
         view.set_reorderable(False)
@@ -471,30 +449,30 @@ class TreeFileBrowser(gobject.GObject):
         view.connect('cursor-changed', self.cursor_changed)
         view.connect('button_press_event', self.button_pressed)
 
-        col = gtk.TreeViewColumn()
+        col = Gtk.TreeViewColumn()
 
         # The icon
-        render_pixbuf = gtk.CellRendererPixbuf()
-        col.pack_start(render_pixbuf, expand=False)
+        render_pixbuf = Gtk.CellRendererPixbuf()
+        col.pack_start(render_pixbuf, True)
         col.add_attribute(render_pixbuf, 'pixbuf', 0)
 
         # The dir name
-        render_text = gtk.CellRendererText()
-        col.pack_start(render_text, expand=True)
+        render_text = Gtk.CellRendererText()
+        col.pack_start(render_text, True)
         col.add_attribute(render_text, 'text', 1)
 
         view.append_column(col)
         view.show()
 
         # Create scrollbars around the view
-        scrolled = gtk.ScrolledWindow()
-        scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolled.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scrolled.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         scrolled.add(view)
         scrolled.show()
 
         return view, scrolled
 
-gobject.type_register(TreeFileBrowser)
+GObject.type_register(TreeFileBrowser)
 
 # End TreeFileBrowser

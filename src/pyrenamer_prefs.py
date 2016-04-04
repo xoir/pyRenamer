@@ -75,7 +75,7 @@ class PyrenamerPrefs:
                    }
         self.builder.connect_signals(signals)
 
-        client = gconf.client_get_default()
+        client = GConf.Client.get_default()
         root_dir = client.get_string(self.gconf_root_dir)
         if root_dir == (None or ''): root_dir = self.main.root_dir
         active_dir = client.get_string(self.gconf_active_dir)
@@ -93,15 +93,15 @@ class PyrenamerPrefs:
         """ Browse root clicked """
         f = Gtk.FileChooserDialog(_('Select root directory'),
                                   self.builder.get_object('prefs_window'),
-                                  Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                  (Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT,
-                                   Gtk.STOCK_OK, Gtk.RESPONSE_ACCEPT),
+                                  Gtk.FileChooserAction.SELECT_FOLDER,
+                                  (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                   Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT),
                                    )
         f.set_current_folder(self.builder.get_object('prefs_entry_root').get_text())
         response = f.run()
-        if response == Gtk.RESPONSE_ACCEPT:
+        if response == Gtk.ResponseType.ACCEPT:
             self.builder.get_object('prefs_entry_root').set_text(f.get_filename())
-        elif response == Gtk.RESPONSE_REJECT:
+        elif response == Gtk.ResponseType.REJECT:
             pass
         f.destroy()
 
@@ -110,15 +110,15 @@ class PyrenamerPrefs:
         """ Browse active clicked """
         f = Gtk.FileChooserDialog(_('Select active directory'),
                                   self.builder.get_object('prefs_window'),
-                                  Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                  (Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT,
-                                   Gtk.STOCK_OK, Gtk.RESPONSE_ACCEPT),
+                                  Gtk.FileChooserAction.SELECT_FOLDER,
+                                  (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                   Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT),
                                    )
         f.set_current_folder(self.builder.get_object('prefs_entry_active').get_text())
         response = f.run()
-        if response == Gtk.RESPONSE_ACCEPT:
+        if response == Gtk.ResponseType.ACCEPT:
             self.builder.get_object('prefs_entry_active').set_text(f.get_filename())
-        elif response == Gtk.RESPONSE_REJECT:
+        elif response == Gtk.ResponseType.REJECT:
             pass
         f.destroy()
 
@@ -200,7 +200,7 @@ class PyrenamerPrefs:
 
     def preferences_save(self):
         """ Width and height are saved on the configure_event callback for main_window """
-        client = gconf.client_get_default()
+        client = GConf.Client.get_default()
         client.set_int(self.gconf_pane_position, self.main.pane_position)
         client.set_bool(self.gconf_window_maximized, self.main.window_maximized)
         client.set_int(self.gconf_window_width, self.main.window_width)
@@ -215,13 +215,13 @@ class PyrenamerPrefs:
 
     def preferences_save_dirs(self):
         """ Save default directories """
-        client = gconf.client_get_default()
+        client = GConf.Client.get_default()
         client.set_string(self.gconf_root_dir, self.main.root_dir)
         client.set_string(self.gconf_active_dir, self.main.active_dir)
 
     def preferences_read(self):
         """ The name says it all... """
-        client = gconf.client_get_default()
+        client = GConf.Client.get_default()
 
         root_dir = client.get_string(self.gconf_root_dir)
         if root_dir != None and root_dir != '': self.main.root_dir = root_dir

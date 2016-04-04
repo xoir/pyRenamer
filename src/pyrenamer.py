@@ -25,14 +25,15 @@ import argparse
 import gi 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 import ConfigParser
 
 import treefilebrowser
 import pyrenamer_filefuncs as renamerfilefuncs
 import pyrenamer_globals as pyrenamerglob
-import pyrenamer_tooltips as tooltips
 import pyrenamer_prefs
 import pyrenamer_pattern_editor
 import pyrenamer_menu_cb
@@ -47,8 +48,7 @@ import gettext
 from gettext import gettext as _
 gettext.bindtextdomain(pyrenamerglob.name, pyrenamerglob.locale_dir)
 gettext.textdomain(pyrenamerglob.name)
-#gtk.glade.bindtextdomain(pyrenamerglob.name, pyrenamerglob.locale_dir)
-#gtk.glade.textdomain(pyrenamerglob.name)
+
 
 class pyRenamer:
 
@@ -67,13 +67,9 @@ class pyRenamer:
         self.patterns = {}
         self.patterns_default = {
             "main_ori": "",
-            "main_dest": "",
-            "images_ori": "",
-            "images_dest": "",
-            "music_ori": "",
-            "music_dest": "" }
-
-
+            "main_dest": ""
+        }
+        
         # Window geometry vars
         self.window_maximized = False
         self.window_width = 500
@@ -144,15 +140,6 @@ class pyRenamer:
             'menu_show_options',
             'menu_undo',
             'menu_redo',
-            'menu_music',
-            'images_original_pattern',
-            'images_renamed_pattern',
-            'images_original_pattern_combo',
-            'images_renamed_pattern_combo',
-            'music_original_pattern',
-            'music_renamed_pattern',
-            'music_original_pattern_combo',
-            'music_renamed_pattern_combo'
             ]
             
         self.builder = Gtk.Builder()
@@ -202,12 +189,10 @@ class pyRenamer:
                     "on_preferences_activate": self.on_preferences_activate,
                     "on_menu_refresh_activate": self.menu_cb.on_menu_refresh_activate,
                     "on_menu_patterns_activate": self.menu_cb.on_menu_patterns_activate,
+                    "on_menu_show_options_activate": self.menu_cb.on_menu_show_options_activate,
                     "on_menu_substitutions_activate": self.menu_cb.on_menu_substitutions_activate,
                     "on_menu_insert_activate": self.menu_cb.on_menu_insert_activate,
                     "on_menu_manual_activate": self.menu_cb.on_menu_manual_activate,
-                    "on_menu_images_activate": self.menu_cb.on_menu_images_activate,
-                    "on_menu_music_activate": self.menu_cb.on_menu_music_activate,
-                    "on_menu_show_options_activate": self.menu_cb.on_menu_show_options_activate,
                     "on_subs_spaces_toggled": self.on_subs_spaces_toggled,
                     "on_subs_capitalization_toggled": self.on_subs_capitalization_toggled,
                     "on_subs_spaces_combo_changed": self.on_subs_spaces_combo_changed,
@@ -224,22 +209,6 @@ class pyRenamer:
                     "on_delete_radio_toggled": self.on_delete_radio_toggled,
                     "on_delete_from_changed": self.on_delete_from_changed,
                     "on_delete_to_changed": self.on_delete_to_changed,
-                    "on_images_original_pattern_changed": self.on_images_original_pattern_changed,
-                    "on_images_renamed_pattern_changed": self.on_images_renamed_pattern_changed,
-                    "on_images_ori_save_clicked": self.on_images_ori_save_clicked,
-                    "on_images_ori_edit_clicked": self.on_images_ori_edit_clicked,
-                    "on_images_dest_save_clicked": self.on_images_dest_save_clicked,
-                    "on_images_dest_edit_clicked": self.on_images_dest_edit_clicked,
-                    "on_images_original_pattern_combo_changed": self.on_images_original_pattern_combo_changed,
-                    "on_images_renamed_pattern_combo_changed": self.on_images_renamed_pattern_combo_changed,
-                    "on_music_original_pattern_changed": self.on_music_original_pattern_changed,
-                    "on_music_renamed_pattern_changed": self.on_music_renamed_pattern_changed,
-                    "on_music_ori_save_clicked": self.on_music_ori_save_clicked,
-                    "on_music_ori_edit_clicked": self.on_music_ori_edit_clicked,
-                    "on_music_dest_save_clicked": self.on_music_dest_save_clicked,
-                    "on_music_dest_edit_clicked": self.on_music_dest_edit_clicked,
-                    "on_music_original_pattern_combo_changed": self.on_music_original_pattern_combo_changed,
-                    "on_music_renamed_pattern_combo_changed": self.on_music_renamed_pattern_combo_changed,
                     "on_menu_quit_activate": self.on_main_quit,
                     "on_menu_about_activate": self.about_info,
                     "on_notebook_switch_page": self.on_notebook_switch_page,
@@ -253,11 +222,11 @@ class pyRenamer:
         self.progressbar.set_size_request(-1,14)
 
         self.progressbar_vbox = Gtk.VBox()
-        self.progressbar_vbox.pack_start(self.progressbar, 0, 0)
+        self.progressbar_vbox.pack_start(self.progressbar, True, 0, 0)
         self.progressbar_vbox.set_homogeneous(True)
 
         self.stop_button = Gtk.Button()
-        self.stop_button.set_relief(Gtk.RELIEF_NONE)
+        self.stop_button.set_relief(Gtk.ReliefStyle.NONE)
 
         # stop_image = Gtk.Image()
         # stop_image.set_from_file(pyrenamerglob.pixmaps_dir+'/stop.png')
@@ -265,19 +234,21 @@ class pyRenamer:
         self.stop_button.connect("clicked", self.on_stop_button_clicked)
         #self.stop_button.set_image(stop_image)
 
-        self.builder.get_object('statusbar').pack_start(self.stop_button,0,0)
-        self.builder.get_object('statusbar').pack_start(self.progressbar_vbox,0,0)
+        self.builder.get_object('statusbar').pack_start(self.stop_button,True,0,0)
+        self.builder.get_object('statusbar').pack_start(self.progressbar_vbox,True,0,0)
         self.builder.get_object('statusbar').set_size_request(-1,20)
         self.builder.get_object('statusbar').show_all()
         self.stop_button.hide()
 
         # Init main window
         self.builder.get_object('main_window').set_title(pyrenamerglob.name_long)
+        self.builder.get_object('main_window').set_has_resize_grip(True)
         self.builder.get_object('main_window').set_icon_from_file(pyrenamerglob.icon)
         self.builder.get_object('main_window').move(self.window_posx, self.window_posy)
         self.builder.get_object('main_hpaned').set_position(self.pane_position)
         self.builder.get_object('main_window').resize(self.window_width, self.window_height)
-        if self.window_maximized: self.builder.get_object('main_window').maximize()
+        if self.window_maximized:
+            self.builder.get_object('main_window').maximize()
 
         # Init TreeFileBrowser
         self.file_browser = treefilebrowser.TreeFileBrowser(self.root_dir)
@@ -322,19 +293,6 @@ class pyRenamer:
         # # Init pattern comboboxes
         self.populate_pattern_combos()
 
-        # # Init tooltips
-        #tips = tooltips.ToolTips(self.column_preview)
-        #tips.add_view(self.selected_files)
-
-        # Hide music tab if necessary
-        if not pyrenamerglob.have_hachoir and not pyrenamerglob.have_eyed3:
-            self.builder.get_object('notebook').get_nth_page(5).hide()
-            #self.builder.get_object('menu_music').hide()
-        if pyrenamerglob.have_hachoir:
-            print "Using hachoir for music renaming."
-        elif pyrenamerglob.have_eyed3:
-            print "Using eyed3 for music renaming."
-
         # # Init the undo/redo manager
         self.undo_manager = pyrenamer_undo.PyrenamerUndo()
         self.builder.get_object('menu_undo').set_sensitive(False)
@@ -352,13 +310,13 @@ class pyRenamer:
         view.set_enable_search(True)
         view.set_reorderable(False)
         view.set_rules_hint(True)
-        view.get_selection().set_mode(Gtk.SELECTION_MULTIPLE)
+        view.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         view.connect("cursor-changed", self.on_selected_files_cursor_changed)
 
         # Create scrollbars around the view
         scrolled = Gtk.ScrolledWindow()
-        scrolled.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
-        scrolled.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
+        scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scrolled.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         scrolled.add(view)
         scrolled.show()
 
@@ -368,7 +326,7 @@ class pyRenamer:
     def create_model(self):
         """ Create the model to hold the needed data
         Model = [file, /path/to/file, newfilename, /path/to/newfilename] """
-        self.file_selected_model = Gtk.TreeStore(str, str, str, str, Gtk.gdk.Pixbuf)
+        self.file_selected_model = Gtk.TreeStore(str, str, str, str, GdkPixbuf.Pixbuf)
         self.selected_files.set_model(self.file_selected_model)
 
         renderer0 = Gtk.CellRendererPixbuf()
@@ -468,7 +426,7 @@ class pyRenamer:
 
         elif self.builder.get_object('notebook').get_current_page() == 3:
             # Manual rename
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_SINGLE)
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
             nmodel, niter = self.selected_files.get_selection().get_selected()
             if niter != None:
                 if nmodel.get_value(niter,0) == name:
@@ -477,26 +435,9 @@ class pyRenamer:
                 else:
                     newname = model.get_value(iter, 2)
                     newpath = model.get_value(iter, 3)
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_MULTIPLE)
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
 
-        elif self.builder.get_object('notebook').get_current_page() == 4:
-            # Replace images using patterns
-            pattern_ini = self.images_original_pattern.get_text()
-            pattern_end = self.images_renamed_pattern.get_text()
-            newname, newpath = renamerfilefuncs.rename_using_patterns(newname, newpath, pattern_ini, pattern_end, self.count)
-            newname, newpath = renamerfilefuncs.replace_images(name, path, newname, newpath)
-
-        elif self.builder.get_object('notebook').get_current_page() == 5 and (pyrenamerglob.have_hachoir or pyrenamerglob.have_eyed3):
-            # Replace music using patterns
-            pattern_ini = self.music_original_pattern.get_text()
-            pattern_end = self.music_renamed_pattern.get_text()
-            newname, newpath = renamerfilefuncs.rename_using_patterns(newname, newpath, pattern_ini, pattern_end, self.count)
-            if pyrenamerglob.have_hachoir:
-                newname, newpath = renamerfilefuncs.replace_music_hachoir(name, path, newname, newpath)
-            elif pyrenamerglob.have_eyed3:
-                newname, newpath = renamerfilefuncs.replace_music_eyed3(name, path, newname, newpath)
-
-
+            
         # Add the kept extension
         if self.keepext and self.builder.get_object('notebook').get_current_page() != 3 and (newname and newpath) != '':
             if ext != '': newname, newpath = renamerfilefuncs.add_extension(newname, newpath, ext)
@@ -572,7 +513,7 @@ class pyRenamer:
         if self.builder.get_object('notebook').get_current_page() == 3:
             # Manual rename
             try:
-                self.selected_files.get_selection().set_mode(Gtk.SELECTION_SINGLE)
+                self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
                 model, iter = treeview.get_selection().get_selected()
                 name = model.get_value(iter,0)
                 newname = model.get_value(iter,2)
@@ -591,13 +532,13 @@ class pyRenamer:
 
     def on_main_window_window_state_event(self, window, event):
         """ Thrown when window is maximized or demaximized """
-        if event.changed_mask & Gtk.gdk.WINDOW_STATE_MAXIMIZED:
-            if event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED:
+        if event.changed_mask & Gdk.WindowState.MAXIMIZED:
+            if event.new_window_state & Gdk.WindowState.MAXIMIZED:
                 self.window_maximized = True
-                self.builder.get_object('statusbar').set_has_resize_grip(False)
+                self.builder.get_object('main_window').set_has_resize_grip(False)
             else:
                 self.window_maximized = False
-                self.builder.get_object('statusbar').set_has_resize_grip(True)
+                self.builder.get_object('main_window').set_has_resize_grip(True)
 
 
     def on_main_window_configure_event(self, window, event):
@@ -652,7 +593,7 @@ class pyRenamer:
         if self.builder.get_object('notebook').get_current_page() == 3:
             # Manual rename
             try:
-                self.selected_files.get_selection().set_mode(Gtk.SELECTION_SINGLE)
+                self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
                 model, iter = self.selected_files.get_selection().get_selected()
                 name = model.get_value(iter,0)
                 newname = model.get_value(iter,2)
@@ -677,12 +618,12 @@ class pyRenamer:
             self.builder.get_object('options_vbox').show()
             self.builder.get_object('options_label').show()
             icon = self.builder.get_object('options_button').get_child()
-            icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.ICON_SIZE_MENU)
+            icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
         else:
             self.builder.get_object('options_vbox').hide()
             self.builder.get_object('options_label').hide()
             icon = self.builder.get_object('options_button').get_child()
-            icon.set_from_stock(Gtk.STOCK_PREFERENCES, Gtk.ICON_SIZE_MENU)
+            icon.set_from_stock(Gtk.STOCK_PREFERENCES, Gtk.IconSize.MENU)
 
         self.options_shown = state
         self.builder.get_object('menu_show_options').set_active(state)
@@ -862,37 +803,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-    def on_images_original_pattern_changed(self, widget):
-        """ Reload current dir and disable Rename button """
-        self.builder.get_object('rename_button').set_sensitive(False)
-        self.builder.get_object('menu_rename').set_sensitive(False)
-        if self.autopreview:
-            self.on_preview_button_clicked(None)
-
-
-    def on_images_renamed_pattern_changed(self, widget):
-        """ Disable Rename button (user has to click on Preview again) """
-        self.builder.get_object('rename_button').set_sensitive(False)
-        self.builder.get_object('menu_rename').set_sensitive(False)
-        if self.autopreview:
-            self.on_preview_button_clicked(None)
-
-
-    def on_music_original_pattern_changed(self, widget):
-        """ Reload current dir and disable Rename button """
-        self.builder.get_object('rename_button').set_sensitive(False)
-        self.builder.get_object('menu_rename').set_sensitive(False)
-        if self.autopreview:
-            self.on_preview_button_clicked(None)
-
-
-    def on_music_renamed_pattern_changed(self, widget):
-        """ Disable Rename button (user has to click on Preview again) """
-        self.builder.get_object('rename_button').set_sensitive(False)
-        self.builder.get_object('menu_rename').set_sensitive(False)
-        if self.autopreview:
-            self.on_preview_button_clicked(None)
-
 
     def populate_pattern_combos(self):
         """ Populate pattern combo boxes """
@@ -901,19 +811,12 @@ class pyRenamer:
         self.patterns = {}
         self.builder.get_object('original_pattern_combo').get_model().clear()
         self.builder.get_object('renamed_pattern_combo').get_model().clear()
-        self.builder.get_object('images_original_pattern_combo').get_model().clear()
-        self.builder.get_object('images_renamed_pattern_combo').get_model().clear()
-        self.builder.get_object('music_original_pattern_combo').get_model().clear()
-        self.builder.get_object('music_renamed_pattern_combo').get_model().clear()
 
         pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
         main_ori = pe.get_patterns('main_ori')
         main_dest = pe.get_patterns('main_dest')
-        images_ori = pe.get_patterns('images_ori')
-        images_dest = pe.get_patterns('images_dest')
-        music_ori = pe.get_patterns('music_ori')
-        music_dest = pe.get_patterns('music_dest')
 
+        
         def set_combo_element(combo, newtext):
             pos = 0
             try:
@@ -949,30 +852,6 @@ class pyRenamer:
             self.builder.get_object('renamed_pattern_combo').append_text(p)
         set_combo_element(self.builder.get_object('renamed_pattern_combo'), self.patterns_default["main_dest"])
         self.patterns["main_dest"] = main_dest
-
-        # Images original
-        for p in images_ori:
-            self.builder.get_object('images_original_pattern_combo').append_text(p)
-        set_combo_element(self.builder.get_object('images_original_pattern_combo'), self.patterns_default["images_ori"])
-        self.patterns["images_ori"] = images_ori
-
-        # Images renamed
-        for p in images_dest:
-            self.builder.get_object('images_renamed_pattern_combo').append_text(p)
-        set_combo_element(self.builder.get_object('images_renamed_pattern_combo'), self.patterns_default["images_dest"])
-        self.patterns["images_dest"] = images_dest
-
-        # Music original
-        for p in music_ori:
-            self.builder.get_object('music_original_pattern_combo').append_text(p)
-        set_combo_element(self.builder.get_object('music_original_pattern_combo'), self.patterns_default["music_ori"])
-        self.patterns["music_ori"] = music_ori
-
-        # Music renamed
-        for p in music_dest:
-            self.builder.get_object('music_renamed_pattern_combo').append_text(p)
-        set_combo_element(self.builder.get_object('music_renamed_pattern_combo'), self.patterns_default["music_dest"])
-        self.patterns["music_dest"] = music_dest
 
 
     def on_pattern_ori_save_clicked(self, widget):
@@ -1021,98 +900,6 @@ class pyRenamer:
         pe.create_window('main_dest')
 
 
-    def on_images_ori_save_clicked(self, widget):
-
-        # Get the pattern value
-        text = self.images_original_pattern.get_text()
-
-        # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.add_pattern('images_ori', text)
-
-        # Add it to the variable
-        patterns = self.patterns["images_ori"]
-        patterns.append(text)
-        self.patterns["images_ori"] = patterns
-
-        # And show it on combobox
-        self.images_original_pattern_combo.append_text(text)
-
-
-    def on_images_ori_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.create_window('images_ori')
-
-
-    def on_images_dest_save_clicked(self, widget):
-
-        # Get the pattern value
-        text = self.images_renamed_pattern.get_text()
-
-        # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.add_pattern('images_dest', text)
-
-        # Add it to the variable
-        patterns = self.patterns["images_dest"]
-        patterns.append(text)
-        self.patterns["images_dest"] = patterns
-
-        # And show it on combobox
-        self.images_renamed_pattern_combo.append_text(text)
-
-
-    def on_images_dest_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.create_window('images_dest')
-
-
-    def on_music_ori_save_clicked(self, widget):
-
-        # Get the pattern value
-        text = self.music_original_pattern.get_text()
-
-        # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.add_pattern('music_ori', text)
-
-        # Add it to the variable
-        patterns = self.patterns["music_ori"]
-        patterns.append(text)
-        self.patterns["music_ori"] = patterns
-
-        # And show it on combobox
-        self.music_original_pattern_combo.append_text(text)
-
-
-    def on_music_ori_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.create_window('music_ori')
-
-
-    def on_music_dest_save_clicked(self, widget):
-
-        # Get the pattern value
-        text = self.music_renamed_pattern.get_text()
-
-        # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.add_pattern('music_dest', text)
-
-        # Add it to the variable
-        patterns = self.patterns["music_dest"]
-        patterns.append(text)
-        self.patterns["music_dest"] = patterns
-
-        # And show it on combobox
-        self.music_renamed_pattern_combo.append_text(text)
-
-
-    def on_music_dest_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
-        pe.create_window('music_dest')
-
-
     def on_original_pattern_combo_changed (self, widget):
         text = widget.get_active_text()
         self.patterns_default["main_ori"] = text
@@ -1123,35 +910,15 @@ class pyRenamer:
         self.patterns_default["main_dest"] = text
 
 
-    def on_images_original_pattern_combo_changed (self, widget):
-        text = widget.get_active_text()
-        self.patterns_default["images_ori"] = text
-
-
-    def on_images_renamed_pattern_combo_changed (self, widget):
-        text = widget.get_active_text()
-        self.patterns_default["images_dest"] = text
-
-
-    def on_music_original_pattern_combo_changed (self, widget):
-        text = widget.get_active_text()
-        self.patterns_default["music_ori"] = text
-
-
-    def on_music_renamed_pattern_combo_changed (self, widget):
-        text = widget.get_active_text()
-        self.patterns_default["music_dest"] = text
-
-
     def on_notebook_switch_page(self, notebook, page, page_num):
         """ Tab changed """
         if page_num != 3:
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_MULTIPLE)
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
 
         else:
             # Manual rename
             try:
-                self.selected_files.get_selection().set_mode(Gtk.SELECTION_SINGLE)
+                self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
                 model, iter = self.selected_files.get_selection().get_selected()
                 name = model.get_value(iter,0)
                 newname = model.get_value(iter,2)
@@ -1193,14 +960,14 @@ class pyRenamer:
     def on_select_all_activate(self, widget):
         """ Select every row on selected-files treeview """
         if self.builder.get_object('notebook').get_current_page() == 3:
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_MULTIPLE)
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         self.selected_files.get_selection().select_all()
 
 
     def on_select_nothing_activate(self, widget):
         """ Select nothing on selected-files treeview """
         if self.builder.get_object('notebook').get_current_page() == 3:
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_MULTIPLE)
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         self.selected_files.get_selection().unselect_all()
 
 
@@ -1213,8 +980,8 @@ class pyRenamer:
         """ Key pressed on manual rename entry """
 
         if self.builder.get_object('notebook').get_current_page() == 3:
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_SINGLE)
-            if event.keyval == Gtk.keysyms.Page_Up:
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
+            if event.keyval == Gdk.KEY_Page_Up:
                 try:
                     self.preview_selected_row()
                     self.file_selected_model.foreach(self.enable_rename_and_clean)
@@ -1231,7 +998,7 @@ class pyRenamer:
                     self.builder.get_object('manual').handler_unblock(self.manual_signal)
                 except:
                     pass
-            elif event.keyval == Gtk.keysyms.Page_Down:
+            elif event.keyval == Gdk.KEY_Page_Down:
                 try:
                     self.preview_selected_row()
                     self.file_selected_model.foreach(self.enable_rename_and_clean)
@@ -1247,7 +1014,7 @@ class pyRenamer:
                     self.builder.get_object('manual').handler_unblock(self.manual_signal)
                 except:
                     pass
-            elif event.keyval == Gtk.keysyms.Return:
+            elif event.keyval == Gdk.KEY_Return:
                 try:
                     self.preview_selected_row()
                     self.file_selected_model.foreach(self.enable_rename_and_clean)
@@ -1263,7 +1030,7 @@ class pyRenamer:
                     self.builder.get_object('manual').handler_unblock(self.manual_signal)
                 except:
                     pass
-            self.selected_files.get_selection().set_mode(Gtk.SELECTION_MULTIPLE)
+            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
 
 
     def on_menu_load_names_from_file_activate(self, widget):
@@ -1272,14 +1039,14 @@ class pyRenamer:
         filename = ""
         f = Gtk.FileChooserDialog(_('Select file'),
                                   self.builder.get_object('main_window'),
-                                 Gtk.FILE_CHOOSER_ACTION_OPEN,
-                                  (Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT,
-                                   Gtk.STOCK_OK, Gtk.RESPONSE_ACCEPT),
+                                 Gtk.FileChooserAction.OPEN,
+                                  (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                   Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT),
                                    )
         response = f.run()
-        if response == Gtk.RESPONSE_ACCEPT:
+        if response == Gtk.ResponseType.ACCEPT:
             filename = f.get_filename()
-        elif response == Gtk.RESPONSE_REJECT:
+        elif response == Gtk.ResponseType.REJECT:
             pass
         f.destroy()
 
@@ -1439,48 +1206,48 @@ class pyRenamer:
         f.close()
 
 
-#    def get_icon(self, path):
+    def get_icon(self, path):
 
-#        icon_theme = gtk.icon_theme_get_default()
-#        if ospath.isdir(path):
-#            try:
-#                icon = icon_theme.load_icon("gnome-fs-directory", 16, 0)
-#                return icon
-#            except GObject.GError, exc:
-#                try:
-#                    icon = icon_theme.load_icon("gtk-directory", 16, 0)
-#                    return icon
-#                except:
-#                    return None
-#        else:
+        icon_theme = Gtk.IconTheme.get_default()
+        if ospath.isdir(path):
+            try:
+                icon = icon_theme.load_icon("gnome-fs-directory", 16, 0)
+                return icon
+            except GObject.GError, exc:
+                try:
+                    icon = icon_theme.load_icon("gtk-directory", 16, 0)
+                    return icon
+                except:
+                    return None
+        else:
 
-            # mime = "text-x-generic"
+            mime = "text-x-generic"
 
-            # audio = ["mp3", "ogg", "wav", "aiff"]
-            # image = ["jpg", "gif", "png", "tiff", "tif", "jpeg"]
-            # video = ["avi", "ogm", "mpg", "mpeg", "mov"]
-            # package = ["rar", "zip", "gz", "tar", "bz2", "tgz", "deb", "rpm"]
+            audio = ["mp3", "ogg", "wav", "aiff"]
+            image = ["jpg", "gif", "png", "tiff", "tif", "jpeg"]
+            video = ["avi", "ogm", "mpg", "mpeg", "mov"]
+            package = ["rar", "zip", "gz", "tar", "bz2", "tgz", "deb", "rpm"]
 
-            # file = path.split('/')[-1]
-            # ext = (file.split('.')[-1]).lower()
+            file = path.split('/')[-1]
+            ext = (file.split('.')[-1]).lower()
 
-            # if ext in audio:
-            #     mime = "audio-x-generic"
+            if ext in audio:
+                mime = "audio-x-generic"
 
-            # elif ext in image:
-            #     mime = "image-x-generic"
+            elif ext in image:
+                mime = "image-x-generic"
 
-            # elif ext in video:
-            #     mime = "video-x-generic"
+            elif ext in video:
+                mime = "video-x-generic"
 
-            # elif ext in package:
-            #     mime = "package-x-generic"
+            elif ext in package:
+                mime = "package-x-generic"
 
-            # try:
-            #     icon = icon_theme.load_icon(mime, Gtk.ICON_SIZE_MENU, 0)
-            #     return icon
-            # except GObject.GError, exc:
-            #     return None
+            try:
+                icon = icon_theme.load_icon(mime, Gtk.IconSize.MENU, 0)
+                return icon
+            except GObject.GError, exc:
+                return None
 
 
 #---------------------------------------------------------------------------------------
@@ -1489,7 +1256,7 @@ class pyRenamer:
     def display_error_dialog(self, text):
         """ Yeps, it shows a error dialog """
 
-        dialog = Gtk.MessageDialog(None, 0, Gtk.MESSAGE_ERROR, Gtk.BUTTONS_NONE, text)
+        dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE, text)
         dialog.add_button(_("Ignore errors"), 1)
         dialog.add_button("gtk-ok", 0)
         self.ignore_errors = dialog.run()
@@ -1505,7 +1272,7 @@ class pyRenamer:
         about.set_authors(pyrenamerglob.authors)
         #about.set_artists(pyrenamerglob.artists)
         about.set_translator_credits(_('translator-credits'))
-        about.set_logo(Gtk.gdk.pixbuf_new_from_file(pyrenamerglob.icon))
+        about.set_logo(GdkPixbuf.Pixbuf.new_from_file(pyrenamerglob.icon))
         about.set_license(pyrenamerglob.license)
         about.set_wrap_license(True)
         about.set_comments(_(pyrenamerglob.description))
