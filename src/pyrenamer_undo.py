@@ -36,9 +36,9 @@ class PyrenamerUndo:
     def undo(self):
         for i in self.undo_memory:
             renamerfilefuncs.rename_file(i[1], i[0])
-            print "Undo: %s -> %s" % (i[1] , i[0])
+            print("Undo: %s -> %s" % (i[1] , i[0]))
 
     def redo(self):
         for i in self.undo_memory:
             renamerfilefuncs.rename_file(i[0], i[1])
-            print "Redo: %s -> %s" % (i[0] , i[1])
+            print("Redo: %s -> %s" % (i[0] , i[1]))

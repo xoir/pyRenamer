@@ -2,7 +2,7 @@
 
 """
 TreeFileBrowser a tree-like gtk file browser
-Copyright (C) 2006-2008 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2006-2008, 2016 Adolfo González Blázquez <code@infinicode.org>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -27,11 +27,9 @@ from gi.repository import GdkPixbuf
 
 from gettext import gettext as _
 
-try:
-    from os import path as ospath
-    import dircache
-except:
-    raise SystemExit
+import os
+from os import path as ospath
+
 
 class TreeFileBrowser(GObject.GObject):
     """ A widget that implements a tree-like file browser, like the
@@ -83,7 +81,7 @@ class TreeFileBrowser(GObject.GObject):
         elif property.name == 'path':
             return self.root
         else:
-            raise AttributeError, 'unknown property %s' % property.name
+            raise AttributeError('unknown property %s' % property.name)
 
     def do_set_property(self, property, value):
         """ GObject set_property method """
@@ -96,7 +94,7 @@ class TreeFileBrowser(GObject.GObject):
         elif property.name == 'path':
             self.root = value
         else:
-            raise AttributeError, 'unknown property %s' % property.name
+            raise AttributeError('unknown property %s' % property.name)
 
     def get_view(self):
         return self.view
@@ -326,7 +324,7 @@ class TreeFileBrowser(GObject.GObject):
     def get_file_list(self, model, iter, dir):
         """ Get the file list from a given directory """
 
-        ls = dircache.listdir(dir)
+        ls = os.listdir(dir)
         ls.sort(key=str.lower)
         for i in ls:
             path = ospath.join(dir,i)
@@ -339,8 +337,8 @@ class TreeFileBrowser(GObject.GObject):
                     model.set_value(newiter, 1, i)
                     model.set_value(newiter, 2, path)
                     if ospath.isdir(path):
-                    	try: subdir = dircache.listdir(path)
-                    	except: subdir = []
+                        try: subdir = os.listdir(path)
+                        except: subdir = []
                         if subdir != []:
                             for i in subdir:
                                 if ospath.isdir(ospath.join(path,i)) or not self.show_only_dirs:
@@ -391,7 +389,7 @@ class TreeFileBrowser(GObject.GObject):
         try:
             icon = icon_theme.load_icon("gnome-fs-directory", 16, 0)
             return icon
-        except GObject.GError, exc:
+        except GObject.GError as exc:
             #print "Can't load icon", exc
             try:
                 icon = icon_theme.load_icon("gtk-directory", 16, 0)
@@ -408,7 +406,7 @@ class TreeFileBrowser(GObject.GObject):
         try:
             icon = icon_theme.load_icon("gnome-fs-directory-accept", 16, 0)
             return icon
-        except GObject.GError, exc:
+        except GObject.GError as exc:
             #print "Can't load icon", exc
             try:
                 icon = icon_theme.load_icon("gtk-directory", 16, 0)
@@ -425,7 +423,7 @@ class TreeFileBrowser(GObject.GObject):
         try:
             icon = icon_theme.load_icon("text-x-generic", Gtk.IconSize.MENU, 0)
             return icon
-        except GObject.GError, exc:
+        except GObject.GError as exc:
             #print "Can't load icon", exc
             return None
 

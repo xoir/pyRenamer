@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-07 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2006-07, 16 Adolfo González Blázquez <code@infinicode.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -21,15 +21,15 @@ If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
 from gettext import gettext as _
+import os
 import os.path
-import user
 from os.path import dirname
 
 pixmaps_dir = "@RESOURCEDIR@"
 resources_dir = "@RESOURCEDIR@"
 locale_dir = "@LOCALEDIR@"
-home_dir = user.home
-config_dir = os.path.join(user.home, '.config/pyRenamer')
+home_dir = os.path.expanduser('~')
+config_dir = os.path.join(home_dir, '.config/pyRenamer')
 
 name = "pyRenamer"
 name_long = "pyRenamer"

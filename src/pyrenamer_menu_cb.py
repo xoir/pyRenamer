@@ -42,22 +42,22 @@ class PyrenamerMenuCB:
         self.main.file_browser.set_active_dir(self.main.active_dir)
 
     def on_menu_patterns_activate(self, widget):
-        self.main.notebook.set_current_page(0)
+        self.main.builder.get_object('notebook').set_current_page(0)
 
     def on_menu_substitutions_activate(self, widget):
-        self.main.notebook.set_current_page(1)
+        self.main.builder.get_object('notebook').set_current_page(1)
 
     def on_menu_insert_activate(self, widget):
-        self.main.notebook.set_current_page(2)
+        self.main.builder.get_object('notebook').set_current_page(2)
 
     def on_menu_manual_activate(self, widget):
-        self.main.notebook.set_current_page(3)
+        self.main.builder.get_object('notebook').set_current_page(3)
 
     def on_menu_images_activate(self, widget):
-        self.main.notebook.set_current_page(4)
+        self.main.builder.get_object('notebook').set_current_page(4)
 
     def on_menu_music_activate(self, widget):
-        self.main.notebook.set_current_page(5)
+        self.main.builder.get_object('notebook').set_current_page(5)
 
     def on_menu_show_options_activate(self, widget):
         self.main.options_panel_state(widget.get_active())
