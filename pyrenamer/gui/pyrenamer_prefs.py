@@ -25,34 +25,35 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 
+import os
 from os import path as ospath
 
-import pyrenamer_globals as pyrenamerglob
+from gui import pyrenamer_globals as pyrenamerglob
 
 from gettext import gettext as _
+import configparser
 
 class PyrenamerPrefs:
 
     def __init__(self, main):
-
         self.main = main
+        self.config_path = os.path.join(
+            os.path.expanduser('~'),'.config/pyrenamer/pyrenamer.cfg')
+        self.config = configparser.ConfigParser()
+        if os.path.isfile(self.config_path):
+            self.config.read(self.config_path)
+        else:
+            self.config['DEFAULT'] = {
+                'RootDir' : os.path.expanduser('~'),
+                'ActiveDir' : os.path.expanduser('~'),
+                'OptionsShown' : 'False',
+                'FileDir' : '0',
+                'Recursive' : 'False',
+                'KeepExt' : 'False',
+                'AutoPreview' : 'False'
+            }
 
-        self.gconf_path = '/apps/' + pyrenamerglob.name
-        self.gconf_root_dir = self.gconf_path + '/root_dir'
-        self.gconf_active_dir = self.gconf_path + '/active_dir'
-        self.gconf_window_maximized = self.gconf_path + '/window_maximized'
-        self.gconf_pane_position = self.gconf_path + '/pane_position'
-        self.gconf_window_width = self.gconf_path + '/window_width'
-        self.gconf_window_height = self.gconf_path + '/window_height'
-        self.gconf_window_posx = self.gconf_path + '/window_posx'
-        self.gconf_window_posy = self.gconf_path + '/window_posy'
-        self.gconf_options_shown = self.gconf_path + '/options_shown'
-        self.gconf_filedir = self.gconf_path + '/filedir'
-        self.gconf_keepext = self.gconf_path + '/keepext'
-        self.gconf_autopreview  = self.gconf_path + '/autopreview'
-        
-
-    def create_preferences_dialog(self):
+    def create_preferences_dialog(self, glade_file, icon):
         """ Create Preferences dialog and connect signals """
         # Create the window
         gui_objects = [
@@ -64,7 +65,7 @@ class PyrenamerPrefs:
             'prefs_close'
             ]
         self.builder = Gtk.Builder()
-        self.builder.add_objects_from_file(pyrenamerglob.gladefile, gui_objects)
+        self.builder.add_objects_from_file(glade_file, gui_objects)
 
         # Signals
         signals = {
@@ -75,20 +76,16 @@ class PyrenamerPrefs:
                    }
         self.builder.connect_signals(signals)
 
-        client = GConf.Client.get_default()
-        root_dir = client.get_string(self.gconf_root_dir)
-        if root_dir == (None or ''): root_dir = self.main.root_dir
-        active_dir = client.get_string(self.gconf_active_dir)
-        if active_dir == (None or ''): active_dir = self.main.active_dir
+        # Fill in text values for the root and active directories
+        root_dir = self.config['DEFAULT']['RootDir']
+        active_dir = self.config['DEFAULT']['ActiveDir']
         self.builder.get_object('prefs_entry_root').set_text(root_dir)
         self.builder.get_object('prefs_entry_active').set_text(active_dir)
 
         # Set prefs window icon
-        self.builder.get_object('prefs_window').set_icon_from_file(pyrenamerglob.icon)
+        self.builder.get_object('prefs_window').set_icon_from_file(icon)
 
 
-
-        
     def on_prefs_browse_root_clicked(self, widget):
         """ Browse root clicked """
         f = Gtk.FileChooserDialog(_('Select root directory'),
@@ -139,11 +136,13 @@ class PyrenamerPrefs:
                 self.main.root_dir = root
                 self.main.active_dir = active
                 self.builder.get_object('prefs_window').destroy()
-                self.preferences_save_dirs()
+                self.preferences_save()
         else:
             self.main.display_error_dialog(_("\nPlease set both directories!"))
-            if root == '': self.builder.get_object('prefs_entry_root').set_text(self.main.root_dir)
-            if active == '': self.builder.get_object('prefs_entry_active').set_text(self.main.active_dir)
+            if root == '': self.builder.get_object(
+                    'prefs_entry_root').set_text(self.main.root_dir)
+            if active == '': self.builder.get_object(
+                    'prefs_entry_active').set_text(self.main.active_dir)
 
 
     def on_prefs_destroy(self, widget):
@@ -152,23 +151,27 @@ class PyrenamerPrefs:
         active = self.builder.get_object('prefs_entry_active').get_text()
         if root != "" and active != "":
             if not self.check_root_dir(root):
-                self.main.display_error_dialog(_("\nThe root directory is not valid!\nPlease select another directory."))
+                self.main.display_error_dialog(_(
+                    "\nThe root directory is not valid!\nPlease select another directory."))
                 self.create_preferences_dialog()
                 self.builder.get_object('prefs_entry_root').set_text('/')
             elif not self.check_active_dir(root, active):
-                self.main.display_error_dialog(_("\nThe active directory is not valid!\nPlease select another directory."))
+                self.main.display_error_dialog(_(
+                    "\nThe active directory is not valid!\nPlease select another directory."))
                 self.create_preferences_dialog()
                 self.builder.get_object('prefs_entry_active').set_text(root)
             else:
                 self.main.root_dir = root
                 self.main.active_dir = active
                 self.builder.get_object('prefs_window').destroy()
-                self.preferences_save_dirs()
+                self.preferences_save()
         else:
             self.main.display_error_dialog(_("\nPlease set both directories!"))
             self.create_preferences_dialog()
-            if root == '': self.builder.get_object('prefs_entry_root').set_text(self.main.root_dir)
-            if active == '': self.builder.get_object('prefs_entry_active').set_text(self.main.active_dir)
+            if root == '': self.builder.get_object(
+                    'prefs_entry_root').set_text(self.main.root_dir)
+            if active == '': self.builder.get_object(
+                    'prefs_entry_active').set_text(self.main.active_dir)
 
 
     def on_add_recursive_toggled(self, widget):
@@ -177,10 +180,12 @@ class PyrenamerPrefs:
 
     def on_filedir_combo_changed(self, combo):
         filedir = combo.get_active()
+        self.config['DEFAULT']['FileDir'] = str(filedir)
         self.main.filedir = filedir
         self.main.dir_reload_current()
 
     def on_extensions_check_toggled(self, check):
+        self.config['DEFAULT']['KeepExt'] = str(check.get_active())
         self.main.keepext = check.get_active()
 
     def on_autopreview_check_toggled(self, check):
@@ -190,71 +195,33 @@ class PyrenamerPrefs:
         """ Checks if the root dir is correct """
         return ospath.isdir(ospath.abspath(root))
 
-
     def check_active_dir(self, root, active):
         """ Checks if active dir is correct """
         root = ospath.abspath(root)
         active = ospath.abspath(active)
         return ospath.isdir(active) and (root in active)
 
-
     def preferences_save(self):
-        """ Width and height are saved on the configure_event callback for main_window """
-        client = GConf.Client.get_default()
-        client.set_int(self.gconf_pane_position, self.main.pane_position)
-        client.set_bool(self.gconf_window_maximized, self.main.window_maximized)
-        client.set_int(self.gconf_window_width, self.main.window_width)
-        client.set_int(self.gconf_window_height, self.main.window_height)
-        client.set_int(self.gconf_window_posx, self.main.window_posx)
-        client.set_int(self.gconf_window_posy, self.main.window_posy)
-        client.set_bool(self.gconf_options_shown, self.main.options_shown)
-        client.set_int(self.gconf_filedir, self.main.filedir)
-        client.set_bool(self.gconf_keepext, self.main.keepext)
-        client.set_bool(self.gconf_autopreview, self.main.autopreview)
+        """ Save preferences to a file using the config_path"""
+        print("Saving....")
+        directory = os.path.dirname(self.config_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        with open(self.config_path, 'w+') as configfile:
+            self.config.write(configfile)
 
-
-    def preferences_save_dirs(self):
-        """ Save default directories """
-        client = GConf.Client.get_default()
-        client.set_string(self.gconf_root_dir, self.main.root_dir)
-        client.set_string(self.gconf_active_dir, self.main.active_dir)
-
-    def preferences_read(self):
-        """ The name says it all... """
-        client = GConf.Client.get_default()
-
-        root_dir = client.get_string(self.gconf_root_dir)
-        if root_dir != None and root_dir != '': self.main.root_dir = root_dir
-
-        active_dir = client.get_string(self.gconf_active_dir)
-        if active_dir != None and active_dir != '': self.main.active_dir = active_dir
-
-        pane_position = client.get_int(self.gconf_pane_position)
-        if pane_position != None: self.main.pane_position = pane_position
-
-        maximized = client.get_bool(self.gconf_window_maximized)
-        if maximized != None: self.main.window_maximized = maximized
-
-        width = client.get_int(self.gconf_window_width)
-        height = client.get_int(self.gconf_window_height)
-        if width != None and height != None:
-            self.main.window_width = width
-            self.main.window_height = height
-
-        posx = client.get_int(self.gconf_window_posx)
-        posy = client.get_int(self.gconf_window_posy)
-        if posx != None and posy != None:
-            self.main.window_posx = posx
-            self.main.window_posy = posy
-
-        options_shown = client.get_bool(self.gconf_options_shown)
-        if options_shown != None: self.main.options_shown = options_shown
-
-        filedir = client.get_int(self.gconf_filedir)
-        if filedir != None: self.main.filedir = filedir
-
-        keepext = client.get_bool(self.gconf_keepext)
-        if keepext != None: self.main.keepext = keepext
-
-        autopreview = client.get_bool(self.gconf_autopreview)
-        if autopreview != None: self.main.autopreview = autopreview
+    def load_preferences(self):
+        """Take preferences from the configuration file and load them into the
+        main gui"""
+        self.main.root_dir = self.config['DEFAULT'].get(
+            'RootDir',os.path.expanduser('~'))
+        self.main.active_dir = self.config['DEFAULT'].get(
+            'ActiveDir',os.path.expanduser('~'))
+        self.main.options_shown = self.config['DEFAULT'].getboolean(
+            'OptionsShown', False)
+        self.main.filedir = self.config['DEFAULT'].getint('FileDir', 0)
+        self.main.recursive = self.config['DEFAULT'].getboolean(
+            'Recursive', False)
+        self.main.keepext = self.config['DEFAULT'].getboolean('KeepExt', False)
+        self.main.autopreview = self.config['DEFAULT'].getboolean(
+            'AutoPreview', False)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-2008 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2006-2008, 2016 Adolfo González Blázquez <code@infinicode.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -21,29 +21,28 @@ If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
 import argparse
-
 import gi 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
-
-import ConfigParser
-
-import treefilebrowser
-import pyrenamer_filefuncs as renamerfilefuncs
-import pyrenamer_globals as pyrenamerglob
-import pyrenamer_prefs
-import pyrenamer_pattern_editor
-import pyrenamer_menu_cb
-import pyrenamer_undo
-
 import threading
+import os
 from os import path as ospath
-
+from os.path import dirname
 import locale
 import gettext
+
+# Local Imports
+from treefilebrowser import treefilebrowser
+from tools import filetools as renamerfilefuncs
+from gui import pyrenamer_globals as pyrenamerglob
+from gui import pyrenamer_prefs
+from gui import pyrenamer_pattern_editor
+from gui import menu as pyrenamer_menu_cb
+from gui import pyrenamer_undo
+
 
 from gettext import gettext as _
 gettext.bindtextdomain(pyrenamerglob.name, pyrenamerglob.locale_dir)
@@ -52,9 +51,15 @@ gettext.textdomain(pyrenamerglob.name)
 
 class pyRenamer:
 
-    def __init__(self, rootdir=None, startdir=None):
+    def __init__(self, root_dir=None, active_dir=None):
 
+        self.name = "pyRenamer"
+        self.version = '0.6'
+        self.authors = 'Adolfo González Blázquez, Thomas Freeman'
         self.menu_cb = pyrenamer_menu_cb.PyrenamerMenuCB(self)
+        self.project_dir = dirname(dirname(os.path.abspath(__file__)))
+        self.glade_file = ospath.join(self.project_dir, 'glade/pyrenamer.ui')
+        self.icon = ospath.join(self.project_dir, 'images/pyrenamer.png')
 
         # Main variables
         self.count = 0
@@ -70,16 +75,8 @@ class pyRenamer:
             "main_dest": ""
         }
         
-        # Window geometry vars
-        self.window_maximized = False
-        self.window_width = 500
-        self.window_height = 500
-        self.window_posx = 0
-        self.window_posy = 0
-        self.pane_position = 250
-
         # Directories variables
-        self.home = pyrenamerglob.home_dir
+        self.home = os.path.expanduser('~')
         self.root_dir = '/'
         self.active_dir = self.home
 
@@ -89,13 +86,9 @@ class pyRenamer:
         self.keepext = False
         self.autopreview = False
 
-        # Read preferences using Gconf
+        # Read preferences
         self.prefs = pyrenamer_prefs.PyrenamerPrefs(self)
-        #self.prefs.preferences_read()
-
-        # Process commanline
-        if rootdir != None: self.root_dir = rootdir
-        if startdir != None: self.active_dir = startdir
+        self.prefs.load_preferences()
 
         # Read GUI data from XML
         gui_objects = [
@@ -143,8 +136,13 @@ class pyRenamer:
             ]
             
         self.builder = Gtk.Builder()
-        self.builder.add_objects_from_file(pyrenamerglob.gladefile, gui_objects)
-
+        self.builder.add_objects_from_file(self.glade_file, gui_objects)
+        self.initialize_defaults()
+        if root_dir != None:
+            self.root_dir = root_dir
+        if active_dir != None:
+            self.active_dir = active_dir
+        
         # Create selected files treeview
         self.selected_files, selected_files_scrolled = self.create_selected_files_treeview()
 
@@ -220,19 +218,17 @@ class pyRenamer:
         self.progressbar = Gtk.ProgressBar()
         self.progressbar.set_pulse_step(0.01)
         self.progressbar.set_size_request(-1,14)
-
         self.progressbar_vbox = Gtk.VBox()
         self.progressbar_vbox.pack_start(self.progressbar, True, 0, 0)
         self.progressbar_vbox.set_homogeneous(True)
-
         self.stop_button = Gtk.Button()
         self.stop_button.set_relief(Gtk.ReliefStyle.NONE)
 
-        # stop_image = Gtk.Image()
-        # stop_image.set_from_file(pyrenamerglob.pixmaps_dir+'/stop.png')
-
+        stop_image = Gtk.Image()
+        stop_image.set_from_file(os.path.join(self.project_dir, 'images/stop.png'))
+        
         self.stop_button.connect("clicked", self.on_stop_button_clicked)
-        #self.stop_button.set_image(stop_image)
+        self.stop_button.set_image(stop_image)
 
         self.builder.get_object('statusbar').pack_start(self.stop_button,True,0,0)
         self.builder.get_object('statusbar').pack_start(self.progressbar_vbox,True,0,0)
@@ -241,15 +237,10 @@ class pyRenamer:
         self.stop_button.hide()
 
         # Init main window
-        self.builder.get_object('main_window').set_title(pyrenamerglob.name_long)
+        self.builder.get_object('main_window').set_title('pyRenamer')
         self.builder.get_object('main_window').set_has_resize_grip(True)
-        self.builder.get_object('main_window').set_icon_from_file(pyrenamerglob.icon)
-        self.builder.get_object('main_window').move(self.window_posx, self.window_posy)
-        self.builder.get_object('main_hpaned').set_position(self.pane_position)
-        self.builder.get_object('main_window').resize(self.window_width, self.window_height)
-        if self.window_maximized:
-            self.builder.get_object('main_window').maximize()
-
+        self.builder.get_object('main_window').set_icon_from_file()
+        
         # Init TreeFileBrowser
         self.file_browser = treefilebrowser.TreeFileBrowser(self.root_dir)
         self.file_browser_view = self.file_browser.get_view()
@@ -298,11 +289,6 @@ class pyRenamer:
         self.builder.get_object('menu_undo').set_sensitive(False)
         self.builder.get_object('menu_redo').set_sensitive(False)
 
-
-
-#---------------------------------------------------------------------------------------
-# Model and View stuff
-
     def create_selected_files_treeview(self):
         """ Create the TreeView and the ScrolledWindow for the selected files """
         view = Gtk.TreeView()
@@ -321,7 +307,6 @@ class pyRenamer:
         scrolled.show()
 
         return view, scrolled
-
 
     def create_model(self):
         """ Create the model to hold the needed data
@@ -973,7 +958,7 @@ class pyRenamer:
 
     def on_preferences_activate(self, widget):
         """ Preferences menu item clicked """
-        self.prefs.create_preferences_dialog()
+        self.prefs.create_preferences_dialog(self.glade_file, self.icon)
 
 
     def on_manual_key_press_event(self, widget, event):
@@ -1057,8 +1042,16 @@ class pyRenamer:
     def on_main_quit(self, *args):
         """ Bye bye! But first, save preferences """
         self.populate_stop()
-        #if HAS_GCONF: self.prefs.preferences_save()
+        self.prefs.preferences_save()
         Gtk.main_quit()
+
+    def initialize_defaults(self):
+        self.options_panel_state(self.options_shown)
+        self.builder.get_object('menu_show_options').set_active(self.options_shown)
+        self.builder.get_object('filedir_combo').set_active(self.filedir)
+        self.builder.get_object('add_recursive').set_active(self.recursive)
+        self.builder.get_object('extensions_check').set_active(self.keepext)
+        self.builder.get_object('autopreview_check').set_active(self.autopreview)
 
 
 #---------------------------------------------------------------------------------------
@@ -1129,7 +1122,7 @@ class pyRenamer:
             self.populate_stop()
         else:
             populate = self.populate_add_to_view(self.listing)
-            self.populate_id.append(GObject.idle_add(populate.next))
+            self.populate_id.append(GObject.idle_add(populate.__next__))
 
 
     def populate_selected_files(self, dir):
@@ -1213,7 +1206,7 @@ class pyRenamer:
             try:
                 icon = icon_theme.load_icon("gnome-fs-directory", 16, 0)
                 return icon
-            except GObject.GError, exc:
+            except GObject.GError as exc:
                 try:
                     icon = icon_theme.load_icon("gtk-directory", 16, 0)
                     return icon
@@ -1246,15 +1239,11 @@ class pyRenamer:
             try:
                 icon = icon_theme.load_icon(mime, Gtk.IconSize.MENU, 0)
                 return icon
-            except GObject.GError, exc:
+            except GObject.GError as exc:
                 return None
 
-
-#---------------------------------------------------------------------------------------
-# Dialog methods
-
     def display_error_dialog(self, text):
-        """ Yeps, it shows a error dialog """
+        """ Display an error message """
 
         dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE, text)
         dialog.add_button(_("Ignore errors"), 1)
@@ -1267,12 +1256,12 @@ class pyRenamer:
         """ Display the About dialog """
 
         about = Gtk.AboutDialog()
-        about.set_name(pyrenamerglob.name_long)
-        about.set_version(pyrenamerglob.version)
-        about.set_authors(pyrenamerglob.authors)
-        #about.set_artists(pyrenamerglob.artists)
+        about.set_name(self.name)
+        about.set_version(self.version)
+        about.set_authors(self.authors)
+        about.set_artists(pyrenamerglob.artists)
         about.set_translator_credits(_('translator-credits'))
-        about.set_logo(GdkPixbuf.Pixbuf.new_from_file(pyrenamerglob.icon))
+        about.set_logo(GdkPixbuf.Pixbuf.new_from_file(self.icon))
         about.set_license(pyrenamerglob.license)
         about.set_wrap_license(True)
         about.set_comments(_(pyrenamerglob.description))
@@ -1282,8 +1271,7 @@ class pyRenamer:
             import webbrowser
             webbrowser.open_new(url)
 
-        Gtk.about_dialog_set_url_hook(openHomePage,pyrenamerglob.website)
-        about.set_website(pyrenamerglob.website)
+        about.set_website()
         about.set_icon_from_file(pyrenamerglob.icon)
         about.run()
         about.destroy()
@@ -1291,9 +1279,9 @@ class pyRenamer:
 def parse_arguments():
     """Read arguments from the command line"""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("-r", "--root",
+    parser.add_argument("-r", "--root_dir",
                         help="Start pyRenamer with a new root dir")
-    parser.add_argument("STARTDIR",
+    parser.add_argument("-s", "--active_dir",
                 help="Directory to select when pyRenamer starts")
     args = parser.parse_args()
     return args
@@ -1302,9 +1290,9 @@ def parse_arguments():
 def main():
     args = parse_arguments() # Parse arguments
     GObject.threads_init() # Start threading
-    py = pyRenamer(args.root, args.STARTDIR) # Initialize program
+    py = pyRenamer(args.root_dir, args.active_dir) # Initialize program
     Gtk.main()
     
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

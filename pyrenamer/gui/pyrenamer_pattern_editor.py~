@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
-import pyrenamer_globals as pyrenamerglob
+import src.pyrenamer_globals as pyrenamerglob
 
 import gi 
 gi.require_version('Gtk', '3.0')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-2008 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2006-2008, 2016 Adolfo González Blázquez <code@infinicode.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -21,7 +21,6 @@ If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
 import os
-import dircache
 import glob
 import re
 import sys
@@ -29,8 +28,6 @@ import time
 from datetime import datetime
 import random
 import unicodedata
-
-import pyrenamer_globals
 
 from gettext import gettext as _
 
@@ -59,7 +56,7 @@ def get_file_listing(dir, mode, pattern=None):
     filelist = []
 
     if  pattern == (None or ''):
-        listaux = dircache.listdir(dir)
+        listaux = os.listdir(dir)
     else:
         if dir != '/': dir += '/'
         dir = escape_pattern(dir + pattern)
@@ -117,7 +114,7 @@ def get_dir_listing(dir):
 
     dirlist = []
 
-    listaux = dircache.listdir(dir)
+    listaux = os.listdir(dir)
     listaux.sort(key=str.lower)
     for elem in listaux:
         if STOP: return dirlist
@@ -141,8 +138,8 @@ def replace_spaces(name, path, mode):
         if mode == 4: ' ' -> '-'
         if mode == 5: '-' -> ' ' """
 
-    name = unicode(name)
-    path = unicode(path)
+    name = str(name)
+    path = str(path)
 
     if mode == 0:
         newname = name.replace(' ', '_')
@@ -158,7 +155,7 @@ def replace_spaces(name, path, mode):
         newname = name.replace('-', ' ')
 
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def replace_capitalization(name, path, mode):
@@ -166,8 +163,8 @@ def replace_capitalization(name, path, mode):
     1: all to lowercase
     2: first letter uppercase
     3: first letter uppercase of each word """
-    name = unicode(name)
-    path = unicode(path)
+    name = str(name)
+    path = str(path)
 
     if mode == 0:
         newname = name.upper()
@@ -180,7 +177,7 @@ def replace_capitalization(name, path, mode):
         newname = ' '.join([x.capitalize() for x in name.split()])
 
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def replace_with(name, path, orig, new):
@@ -188,7 +185,7 @@ def replace_with(name, path, orig, new):
     newname = name.replace(orig, new)
     newpath = get_new_path(newname, path)
 
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def replace_accents(name, path):
@@ -200,21 +197,21 @@ def replace_accents(name, path):
     Standard ASCII characters don't change, such as:
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-`!@#$%^&*(){}[]:;.<>,'
     """
-    name = unicode(name)
-    path = unicode(path)
+    name = str(name)
+    path = str(path)
 
 
     newname = ''.join((c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn'))
 
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def replace_duplicated(name, path):
     """ Remove duplicated symbols """
 
-    name = unicode(name)
-    path = unicode(path)
+    name = str(name)
+    path = str(path)
 
     symbols = ['.', ' ', '-', '_']
 
@@ -227,7 +224,7 @@ def replace_duplicated(name, path):
             newname += c
 
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
@@ -240,8 +237,8 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     {X} Numbers, letters, and spaces
     {@} Trash
     """
-    name = unicode(name)
-    path = unicode(path)
+    name = str(name)
+    path = str(path)
 
     pattern = pattern_ini
     newname = pattern_end
@@ -268,14 +265,14 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
         groups = repattern.search(name).groups()
 
         for i in range(len(groups)):
-            newname = newname.replace('{'+`i+1`+'}',groups[i])
+            newname = newname.replace('{'+repr(i+1)+'}',groups[i])
     except:
         return None, None
 
     # Replace {num} with item number.
     # If {num2} the number will be 02
     # If {num3+10} the number will be 010
-    count = `count`
+    count = repr(count)
     cr = re.compile("{(num)([0-9]*)}"
                     "|{(num)([0-9]*)(\+)([0-9]*)}")
     try:
@@ -311,7 +308,6 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     newname = newname.replace('{dayname}', time.strftime("%A", time.localtime()))
     newname = newname.replace('{daysimp}', time.strftime("%a", time.localtime()))
 
-    print "This routine is running!"
 
     # Some pattern matches for creation and modification date
     createdate, modifydate = get_filestat_data(get_new_path(name, path))
@@ -397,7 +393,7 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
 
     # Returns new name and path
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def get_filestat_data(path):
@@ -408,10 +404,10 @@ def get_filestat_data(path):
     try:
         st = os.stat(path)
         if not st:
-            print "ERROR: File attributes could not be read", path
+            print("ERROR: File attributes could not be read", path)
             return createdate, modifydate
     except:
-        print "ERROR: processing file attributes on", path
+        print("ERROR: processing file attributes on", path)
         return createdate, modifydate
 
     createdate = datetime.fromtimestamp(st.st_ctime).timetuple()
@@ -427,17 +423,17 @@ def rename_file(ori, new):
         return True, None    # We don't need to rename the file, but don't show error message
 
     if os.path.exists(new):
-        print _("Error while renaming %s to %s! -> %s already exists!") % (ori, new, new)
+        print(_("Error while renaming %s to %s! -> %s already exists!") % (ori, new, new))
         error = "[Errno 17] %s" % os.strerror(17)
         return False, error
 
     try:
         os.renames(ori, new)
-        print "Renaming %s to %s" % (ori, new)
+        print("Renaming %s to %s" % (ori, new))
         return True, None
-    except Exception, e:
-        print _("Error while renaming %s to %s!") % (ori, new)
-        print e
+    except Exception as e:
+        print(_("Error while renaming %s to %s!") % (ori, new))
+        print(e)
         return False, e
 
 
@@ -451,7 +447,7 @@ def insert_at(name, path, text, pos):
         newname = name + text
 
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 
 def delete_from(name, path, ini, to):
@@ -461,7 +457,7 @@ def delete_from(name, path, ini, to):
     newname = textini + textend
 
     newpath = get_new_path(newname, path)
-    return unicode(newname), unicode(newpath)
+    return str(newname), str(newpath)
 
 def cut_extension(name, path):
     """ Remove extension from file name """
