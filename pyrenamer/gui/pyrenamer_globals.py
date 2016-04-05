@@ -40,7 +40,7 @@ website = "http://www.infinicode.org/code/pyrenamer/"
 version = "alpha"
 description = _("Mass file renamer for GNOME")
 icon = os.path.join(dirname(dirname(dirname(__file__))), 'images/pyrenamer.png')
-gladefile = os.path.join(dirname(dirname(dirname(__file__))), 'gui/pyrenamer.ui')
+gladefile = os.path.join(dirname(dirname(dirname(__file__))), 'glade/pyrenamer.ui')
 
 if os.path.isfile('/usr/share/common-licenses/GPL-2'):
 	license = open('/usr/share/common-licenses/GPL-2').read()

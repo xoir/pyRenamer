@@ -53,7 +53,7 @@ class PyrenamerPrefs:
                 'AutoPreview' : 'False'
             }
 
-    def create_preferences_dialog(self):
+    def create_preferences_dialog(self, glade_file, icon):
         """ Create Preferences dialog and connect signals """
         # Create the window
         gui_objects = [
@@ -65,7 +65,7 @@ class PyrenamerPrefs:
             'prefs_close'
             ]
         self.builder = Gtk.Builder()
-        self.builder.add_objects_from_file(pyrenamerglob.gladefile, gui_objects)
+        self.builder.add_objects_from_file(glade_file, gui_objects)
 
         # Signals
         signals = {
@@ -83,7 +83,7 @@ class PyrenamerPrefs:
         self.builder.get_object('prefs_entry_active').set_text(active_dir)
 
         # Set prefs window icon
-        self.builder.get_object('prefs_window').set_icon_from_file(pyrenamerglob.icon)
+        self.builder.get_object('prefs_window').set_icon_from_file(icon)
 
 
     def on_prefs_browse_root_clicked(self, widget):

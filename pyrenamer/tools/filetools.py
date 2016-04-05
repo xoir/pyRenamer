@@ -29,8 +29,6 @@ from datetime import datetime
 import random
 import unicodedata
 
-from src import pyrenamer_globals
-
 from gettext import gettext as _
 
 STOP = False

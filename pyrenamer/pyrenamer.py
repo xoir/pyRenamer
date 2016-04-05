@@ -28,7 +28,9 @@ from gi.repository import Gdk
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 import threading
+import os
 from os import path as ospath
+from os.path import dirname
 import locale
 import gettext
 
@@ -52,6 +54,9 @@ class pyRenamer:
     def __init__(self, root_dir=None, active_dir=None):
 
         self.menu_cb = pyrenamer_menu_cb.PyrenamerMenuCB(self)
+        self.glade_file = ospath.join(dirname(os.path.abspath(__file__)), 'glade/pyrenamer.ui')
+        print(self.glade_file)
+        self.prefs_icon = ospath.join(dirname(os.path.abspath(__file__)), 'images/pyrenamer.png')
 
         # Main variables
         self.count = 0
@@ -950,7 +955,7 @@ class pyRenamer:
 
     def on_preferences_activate(self, widget):
         """ Preferences menu item clicked """
-        self.prefs.create_preferences_dialog()
+        self.prefs.create_preferences_dialog(self.glade_file, self.prefs_icon)
 
 
     def on_manual_key_press_event(self, widget, event):
