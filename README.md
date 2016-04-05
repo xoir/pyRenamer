@@ -5,11 +5,8 @@ pyRenamer is an application for mass renaming files.
 
 You can rename files using patterns, substitutions,
 insert or delete text, or even rename files manually.
-You can also rename images using their EXIF tags
-and music using their internal tags.
 
 pyRenamer is released under the terms of the GNU General Public License.
-
 
 ## Requirements
   * python3
