@@ -29,7 +29,7 @@ from datetime import datetime
 import random
 import unicodedata
 
-import pyrenamer_globals
+import src.pyrenamer_globals
 
 from gettext import gettext as _
 

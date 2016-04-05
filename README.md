@@ -13,7 +13,7 @@ pyRenamer is released under the terms of the GNU General Public License.
 
 ## Requirements
   * python3
-  * gtk#
+  * gtk3
 
 ## Usage
 

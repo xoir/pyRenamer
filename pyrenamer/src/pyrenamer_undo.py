@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-07 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2006-2007, 2016 Adolfo González Blázquez <code@infinicode.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
-import pyrenamer_filefuncs as renamerfilefuncs
+from tools import filetools as renamerfilefuncs
 
 class PyrenamerUndo:
 

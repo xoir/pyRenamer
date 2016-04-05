@@ -28,7 +28,7 @@ from gi.repository import GObject
 import os
 from os import path as ospath
 
-import pyrenamer_globals as pyrenamerglob
+import src.pyrenamer_globals as pyrenamerglob
 
 from gettext import gettext as _
 import configparser

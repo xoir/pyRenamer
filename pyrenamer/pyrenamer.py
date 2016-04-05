@@ -33,13 +33,13 @@ import locale
 import gettext
 
 # Local Imports
-import treefilebrowser
-import pyrenamer_filefuncs as renamerfilefuncs
-import pyrenamer_globals as pyrenamerglob
-import pyrenamer_prefs
-import pyrenamer_pattern_editor
-import pyrenamer_menu_cb
-import pyrenamer_undo
+from treefilebrowser import treefilebrowser
+from tools import filetools as renamerfilefuncs
+import src.pyrenamer_globals as pyrenamerglob
+from src import pyrenamer_prefs
+from src import pyrenamer_pattern_editor
+from src import menu as pyrenamer_menu_cb
+from src import pyrenamer_undo
 
 
 from gettext import gettext as _
