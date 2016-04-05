@@ -1,24 +1,32 @@
 # -*- coding: utf-8 -*-
+""" Mass file renamer for GNOME"""
 
+__authors__ = [
+    'Adolfo González Blázquez <code@infinicode.org>',
+    'Thomas Freeman <tfree87@users.noreply.github.com>'
+    ]
+__artists__ = ['Adolfo González Blázquez <code@infinicode.org>']
+__copyright__ = """Copyright © 2006-08 Adolfo González Blázquez\n
+        Copyright © 2016 Thomas Freeman"""
+__credits__ = ["Rob Knight", "Peter Maxwell", "Gavin Huttley",
+                    "Matthew Wakefield"]
+__license__ = """
+This program is free software; you can redistribute it and/or modify \
+it under the terms of the GNU General Public License as published by \
+the Free Software Foundation; either version 2 of the License, or \
+(at your option) any later version. \n\n\
+This program is distributed in the hope that it will be useful, but \
+WITHOUT ANY WARRANTY; without even the implied warranty of \
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \
+See the GNU General Public License for more details. \n\n\
+You should have received a copy of the GNU General Public License \
+along with this program; if not, write to the Free Software Foundation, Inc., \
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA."
 """
-Copyright (C) 2006-2008, 2016 Adolfo González Blázquez <code@infinicode.org>
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
-If you find any bugs or have any suggestions email: code@infinicode.org
-"""
+__version__ = "0.6"
+__maintainer__ = "Thomas Freeman"
+__email__ = "tfree87@users.noreply.github.com"
+__status__ = "Beta"
 
 import argparse
 import gi 
@@ -40,7 +48,7 @@ from tools import filetools as renamerfilefuncs
 from gui import pyrenamer_globals as pyrenamerglob
 from gui import pyrenamer_prefs
 from gui import pyrenamer_pattern_editor
-from gui import menu as pyrenamer_menu_cb
+from gui import menu
 from gui import pyrenamer_undo
 
 
@@ -53,9 +61,7 @@ class pyRenamer:
 
     def __init__(self, root_dir=None, active_dir=None):
 
-        self.name = "pyRenamer"
-        self.version = 0.6
-        self.menu_cb = pyrenamer_menu_cb.PyrenamerMenuCB(self)
+        self.menu = menu.PyrenamerMenuCB(self)
         self.project_dir = dirname(dirname(os.path.abspath(__file__)))
         self.glade_file = ospath.join(self.project_dir, 'glade/pyrenamer.ui')
         self.icon = ospath.join(self.project_dir, 'images/pyrenamer.png')
@@ -175,8 +181,8 @@ class pyRenamer:
                     "on_menu_rename_activate": self.on_rename_button_clicked,
                     "on_menu_load_names_from_file_activate": self.on_menu_load_names_from_file_activate,
                     "on_menu_clear_preview_activate": self.on_clean_button_clicked,
-                    "on_menu_undo_activate": self.menu_cb.on_menu_undo_activate,
-                    "on_menu_redo_activate": self.menu_cb.on_menu_redo_activate,
+                    "on_menu_undo_activate": self.menu.on_menu_undo_activate,
+                    "on_menu_redo_activate": self.menu.on_menu_redo_activate,
                     "on_cut_activate": self.on_cut_activate,
                     "on_copy_activate": self.on_copy_activate,
                     "on_paste_activate": self.on_paste_activate,
@@ -184,12 +190,12 @@ class pyRenamer:
                     "on_select_all_activate": self.on_select_all_activate,
                     "on_select_nothing_activate": self.on_select_nothing_activate,
                     "on_preferences_activate": self.on_preferences_activate,
-                    "on_menu_refresh_activate": self.menu_cb.on_menu_refresh_activate,
-                    "on_menu_patterns_activate": self.menu_cb.on_menu_patterns_activate,
-                    "on_menu_show_options_activate": self.menu_cb.on_menu_show_options_activate,
-                    "on_menu_substitutions_activate": self.menu_cb.on_menu_substitutions_activate,
-                    "on_menu_insert_activate": self.menu_cb.on_menu_insert_activate,
-                    "on_menu_manual_activate": self.menu_cb.on_menu_manual_activate,
+                    "on_menu_refresh_activate": self.menu.on_menu_refresh_activate,
+                    "on_menu_patterns_activate": self.menu.on_menu_patterns_activate,
+                    "on_menu_show_options_activate": self.menu.on_menu_show_options_activate,
+                    "on_menu_substitutions_activate": self.menu.on_menu_substitutions_activate,
+                    "on_menu_insert_activate": self.menu.on_menu_insert_activate,
+                    "on_menu_manual_activate": self.menu.on_menu_manual_activate,
                     "on_subs_spaces_toggled": self.on_subs_spaces_toggled,
                     "on_subs_capitalization_toggled": self.on_subs_capitalization_toggled,
                     "on_subs_spaces_combo_changed": self.on_subs_spaces_combo_changed,
@@ -238,7 +244,7 @@ class pyRenamer:
         # Init main window
         self.builder.get_object('main_window').set_title('pyRenamer')
         self.builder.get_object('main_window').set_has_resize_grip(True)
-        self.builder.get_object('main_window').set_icon_from_file()
+        self.builder.get_object('main_window').set_icon_from_file(self.icon)
         
         # Init TreeFileBrowser
         self.file_browser = treefilebrowser.TreeFileBrowser(self.root_dir)
@@ -1255,24 +1261,23 @@ class pyRenamer:
         """ Display the About dialog """
 
         about = Gtk.AboutDialog()
-        about.set_name(self.name)
-        about.set_version(self.version)
-        
-        about.set_authors(pyrenamerglob.authors)
-        about.set_artists(pyrenamerglob.artists)
+        about.set_name('pyRenamer')
+        about.set_version(__version__)
+        about.set_authors(__authors__)
+        about.set_artists(__artists__)
         about.set_translator_credits(_('translator-credits'))
         about.set_logo(GdkPixbuf.Pixbuf.new_from_file(self.icon))
-        about.set_license(pyrenamerglob.license)
+        about.set_license(__license__)
         about.set_wrap_license(True)
-        about.set_comments(_(pyrenamerglob.description))
-        about.set_copyright(pyrenamerglob.copyright)
+        about.set_comments(__doc__)
+        about.set_copyright(__copyright__)
 
         def openHomePage(widget,url,url2):
             import webbrowser
             webbrowser.open_new(url)
 
         about.set_website(pyrenamerglob.website)
-        about.set_icon_from_file(pyrenamerglob.icon)
+        about.set_icon_from_file(self.icon)
         about.run()
         about.destroy()
 
