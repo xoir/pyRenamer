@@ -55,7 +55,6 @@ class pyRenamer:
 
         self.menu_cb = pyrenamer_menu_cb.PyrenamerMenuCB(self)
         self.glade_file = ospath.join(dirname(os.path.abspath(__file__)), 'glade/pyrenamer.ui')
-        print(self.glade_file)
         self.prefs_icon = ospath.join(dirname(os.path.abspath(__file__)), 'images/pyrenamer.png')
 
         # Main variables
