@@ -35,11 +35,11 @@ import gettext
 # Local Imports
 from treefilebrowser import treefilebrowser
 from tools import filetools as renamerfilefuncs
-import src.pyrenamer_globals as pyrenamerglob
-from src import pyrenamer_prefs
-from src import pyrenamer_pattern_editor
-from src import menu as pyrenamer_menu_cb
-from src import pyrenamer_undo
+from gui import pyrenamer_globals as pyrenamerglob
+from gui import pyrenamer_prefs
+from gui import pyrenamer_pattern_editor
+from gui import menu as pyrenamer_menu_cb
+from gui import pyrenamer_undo
 
 
 from gettext import gettext as _
@@ -281,11 +281,6 @@ class pyRenamer:
         self.builder.get_object('menu_undo').set_sensitive(False)
         self.builder.get_object('menu_redo').set_sensitive(False)
 
-
-
-#---------------------------------------------------------------------------------------
-# Model and View stuff
-
     def create_selected_files_treeview(self):
         """ Create the TreeView and the ScrolledWindow for the selected files """
         view = Gtk.TreeView()
@@ -304,7 +299,6 @@ class pyRenamer:
         scrolled.show()
 
         return view, scrolled
-
 
     def create_model(self):
         """ Create the model to hold the needed data
