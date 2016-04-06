@@ -28,17 +28,14 @@ from gi.repository import GObject
 import os
 from os import path as ospath
 
-from gui import pyrenamer_globals as pyrenamerglob
-
 from gettext import gettext as _
 import configparser
 
 class PyrenamerPrefs:
 
-    def __init__(self, main):
+    def __init__(self, main, config_dir):
         self.main = main
-        self.config_path = os.path.join(
-            os.path.expanduser('~'),'.config/pyrenamer/pyrenamer.cfg')
+        self.config_path = os.path.join(config_dir, '.config/pyrenamer/pyrenamer.cfg')
         self.config = configparser.ConfigParser()
         if os.path.isfile(self.config_path):
             self.config.read(self.config_path)

@@ -8,8 +8,10 @@ __authors__ = [
 __artists__ = ['Adolfo González Blázquez <code@infinicode.org>']
 __copyright__ = """Copyright © 2006-08 Adolfo González Blázquez\n
         Copyright © 2016 Thomas Freeman"""
-__credits__ = ["Rob Knight", "Peter Maxwell", "Gavin Huttley",
-                    "Matthew Wakefield"]
+__credits__ = [
+    'Adolfo González Blázquez <code@infinicode.org>',
+    'Thomas Freeman <tfree87@users.noreply.github.com>'
+    ]
 __license__ = """
 This program is free software; you can redistribute it and/or modify \
 it under the terms of the GNU General Public License as published by \
@@ -41,21 +43,17 @@ from os import path as ospath
 from os.path import dirname
 import locale
 import gettext
+from gettext import gettext as _
 
 # Local Imports
-from treefilebrowser import treefilebrowser
-from tools import filetools as renamerfilefuncs
-from gui import pyrenamer_globals as pyrenamerglob
 from gui import pyrenamer_prefs
 from gui import pyrenamer_pattern_editor
 from gui import menu
-from gui import pyrenamer_undo
+from treefilebrowser import treefilebrowser
+from tools import filetools as renamerfilefuncs
+from tools import undo
 
-
-from gettext import gettext as _
-gettext.bindtextdomain(pyrenamerglob.name, pyrenamerglob.locale_dir)
-gettext.textdomain(pyrenamerglob.name)
-
+config_dir = os.path.join(os.path.expanduser('~'), 'config/pyRenamer')
 
 class pyRenamer:
 
@@ -92,7 +90,7 @@ class pyRenamer:
         self.autopreview = False
 
         # Read preferences
-        self.prefs = pyrenamer_prefs.PyrenamerPrefs(self)
+        self.prefs = pyrenamer_prefs.PyrenamerPrefs(self, config_dir)
         self.prefs.load_preferences()
 
         # Read GUI data from XML
@@ -290,7 +288,7 @@ class pyRenamer:
         self.populate_pattern_combos()
 
         # # Init the undo/redo manager
-        self.undo_manager = pyrenamer_undo.PyrenamerUndo()
+        self.undo_manager = undo.PyrenamerUndo()
         self.builder.get_object('menu_undo').set_sensitive(False)
         self.builder.get_object('menu_redo').set_sensitive(False)
 
@@ -802,7 +800,7 @@ class pyRenamer:
         self.builder.get_object('original_pattern_combo').get_model().clear()
         self.builder.get_object('renamed_pattern_combo').get_model().clear()
 
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
+        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
         main_ori = pe.get_patterns('main_ori')
         main_dest = pe.get_patterns('main_dest')
 
@@ -850,7 +848,7 @@ class pyRenamer:
         text = self.builder.get_object('original_pattern').get_text()
 
         # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
+        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
         pe.add_pattern('main_ori', text)
 
         # Add it to the variable
@@ -863,7 +861,7 @@ class pyRenamer:
 
 
     def on_pattern_ori_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
+        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
         pe.create_window('main_ori')
 
 
@@ -886,7 +884,7 @@ class pyRenamer:
 
 
     def on_pattern_dest_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
+        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
         pe.create_window('main_dest')
 
 
@@ -1105,7 +1103,7 @@ class pyRenamer:
 
         self.selected_files.set_model(self.file_selected_model)
         self.progressbar.set_fraction(0)
-        self.builder.get_object('statusbar').push(self.statusbar_context, _("Directory: %s - Files: %s") % (self.active_dir, self.count))
+        self.builder.get_object('statusbar').push(self.statusbar_context, ("Directory: %s - Files: %s") % (self.active_dir, self.count))
 
 
     def populate_get_listing(self, dir, pattern, recursive):
@@ -1276,7 +1274,7 @@ class pyRenamer:
             import webbrowser
             webbrowser.open_new(url)
 
-        about.set_website(pyrenamerglob.website)
+        about.set_website('https://github.com/tfree87/pyRenamer')
         about.set_icon_from_file(self.icon)
         about.run()
         about.destroy()

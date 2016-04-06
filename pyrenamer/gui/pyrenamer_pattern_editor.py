@@ -20,8 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
-from gui import pyrenamer_globals as pyrenamerglob
-
 import gi 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -32,12 +30,13 @@ import os
 
 class PyrenamerPatternEditor:
 
-    def __init__(self, main):
+    def __init__(self, main, config_dir, glade_file):
 
         self.main = main
+        self.glade_file = glade_file
 
         # Check if config directory exists
-        self.config_dir = os.path.join(pyrenamerglob.config_dir, 'patterns')
+        self.config_dir = os.path.join(config_dir, 'patterns')
         if not os.path.isdir(self.config_dir):
             os.makedirs(self.config_dir)
 
@@ -118,7 +117,7 @@ class PyrenamerPatternEditor:
         # Create the window
         gui_objects=['pattern_edit_window', 'pattern_edit_treeview']
         self.builder = Gtk.Builder()
-        self.builder.add_objects_from_file(pyrenamerglob.gladefile, gui_objects)
+        self.builder.add_objects_from_file(self.glade_file, gui_objects)
         
         # Signals
         signals = {
@@ -134,7 +133,7 @@ class PyrenamerPatternEditor:
         self.builder.connect_signals(signals)
 
         # Set prefs window icon
-        self.builder.get_object('pattern_edit_window').set_icon_from_file(pyrenamerglob.icon)
+        self.builder.get_object('pattern_edit_window').set_icon_from_file(self.main.icon)
 
         # Set window name
         if 'main' in selector:
@@ -286,12 +285,12 @@ class PyrenamerPatternEditor:
         return model.get_iter_from_string(str(prev_path))
 
 
-    def create_add_dialog(self,):
+    def create_add_dialog(self):
         """ Create pattern add dialog and connect signals """
 
         # Create the dialog
         
-        tree = self.builder.add_objects_from_file(pyrenamerglob.gladefile,
+        tree = self.builder.add_objects_from_file(self.glade_file,
                                                   ['add_pattern_dialog', 'add_pattern_entry'])
 
         # Get widgets
