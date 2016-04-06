@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-2008, 2016 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2006-2008 Adolfo González Blázquez <code@infinicode.org>
+Copyright (C) 2016 Thomas Freeman <tfree87@users.noreply.github.com>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -20,19 +21,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 If you find any bugs or have any suggestions email: code@infinicode.org
 """
 
+# Global Imports
 import gi 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
-
 from gettext import gettext as _
 import os
 
+
 class PyrenamerPatternEditor:
+    """ Create a class of the pattern editor window to store user-defined search
+    and replacement patterns for renaming the files"""
 
     def __init__(self, main, config_dir, glade_file):
+        """ Create an instance of the pattern editor window """
 
         self.main = main
+        # XML definition for the pattern renamer window
         self.glade_file = glade_file
 
         # Check if config directory exists
@@ -42,7 +48,8 @@ class PyrenamerPatternEditor:
 
 
     def get_patterns(self, selector):
-
+        """ Obtain a list of pre-saved patterns from the configuration file for
+        populating the combo boxes in the main window """
         patterns = []
 
         default_patterns = {
@@ -77,6 +84,8 @@ class PyrenamerPatternEditor:
 
 
     def save_patterns(self, selector):
+        """ Write user-defined patterns into file in the configuration
+        directory for later recall."""
 
         config_file = os.path.join(self.config_dir, selector)
         f = open(config_file, 'w')
@@ -91,6 +100,7 @@ class PyrenamerPatternEditor:
 
 
     def add_pattern(self, selector, pattern):
+        """ Append user-defined patterns to the configuration file """
 
         config_file = os.path.join(self.config_dir, selector)
         f = open(config_file, 'a')
@@ -110,30 +120,34 @@ class PyrenamerPatternEditor:
         gui_objects=['pattern_edit_window', 'pattern_edit_treeview']
         self.builder = Gtk.Builder()
         self.builder.add_objects_from_file(self.glade_file, gui_objects)
-        
+
         # Signals
         signals = {
-                   "on_pattern_edit_add_clicked": self.on_pattern_edit_add_clicked,
-                   "on_pattern_edit_del_clicked": self.on_pattern_edit_del_clicked,
-                   "on_pattern_edit_edit_clicked": self.on_pattern_edit_edit_clicked,
-                   "on_pattern_edit_up_clicked": self.on_pattern_edit_up_clicked,
-                   "on_pattern_edit_down_clicked": self.on_pattern_edit_down_clicked,
-                   "on_pattern_edit_close_clicked": self.on_prefs_close_clicked,
-                   "on_pattern_edit_treeview_button_press_event": self.on_pattern_edit_treeview_button_press_event,
-                   "on_pattern_edit_window_destroy": self.on_pattern_edit_destroy,
-                   }
+            "on_pattern_edit_add_clicked": self.on_pattern_edit_add_clicked,
+            "on_pattern_edit_del_clicked": self.on_pattern_edit_del_clicked,
+            "on_pattern_edit_edit_clicked": self.on_pattern_edit_edit_clicked,
+            "on_pattern_edit_up_clicked": self.on_pattern_edit_up_clicked,
+            "on_pattern_edit_down_clicked": self.on_pattern_edit_down_clicked,
+            "on_pattern_edit_close_clicked": self.on_prefs_close_clicked,
+            "on_pattern_edit_treeview_button_press_event": self.on_pattern_edit_treeview_button_press_event,
+            "on_pattern_edit_window_destroy": self.on_pattern_edit_destroy,
+        }
         self.builder.connect_signals(signals)
 
         # Set prefs window icon
-        self.builder.get_object('pattern_edit_window').set_icon_from_file(self.main.icon)
+        self.builder.get_object('pattern_edit_window').set_icon_from_file(
+            self.main.icon)
 
         # Set window name
         if 'main' in selector:
-            self.builder.get_object('pattern_edit_window').set_title(_('Patterns editor'))
+            self.builder.get_object('pattern_edit_window').set_title(_(
+                'Patterns editor'))
         elif 'images' in selector:
-            self.builder.get_object('pattern_edit_window').set_title(_('Image patterns editor'))
+            self.builder.get_object('pattern_edit_window').set_title(_(
+                'Image patterns editor'))
         elif 'music' in selector:
-            self.builder.get_object('pattern_edit_window').set_title(_('Music patterns editor'))
+            self.builder.get_object('pattern_edit_window').set_title(_(
+                'Music patterns editor'))
 
         self.populate_treeview(selector)
 
@@ -166,7 +180,8 @@ class PyrenamerPatternEditor:
         renderer.connect('edited', self.on_cell_edited, self.model)
         column = Gtk.TreeViewColumn("Pattern",renderer, text=0)
         self.builder.get_object('pattern_edit_treeview').append_column(column)
-        self.builder.get_object('pattern_edit_treeview').set_headers_visible(False)
+        self.builder.get_object('pattern_edit_treeview').set_headers_visible(
+            False)
 
 
     def on_cell_edited(self, cell, path, new_text, model):
@@ -190,7 +205,8 @@ class PyrenamerPatternEditor:
             return False
 
         # Add the data
-        selection = self.builder.get_object('pattern_edit_treeview').get_selection()
+        selection = self.builder.get_object(
+            'pattern_edit_treeview').get_selection()
         model, iter = selection.get_selected()
         if iter != None:
             iter = model.insert_after(iter, [data])
@@ -201,7 +217,8 @@ class PyrenamerPatternEditor:
 
 
     def on_pattern_edit_del_clicked(self, widget):
-        selection = self.builder.get_object('pattern_edit_treeview').get_selection()
+        selection = self.builder.get_object(
+            'pattern_edit_treeview').get_selection()
         model, iter = selection.get_selected()
         if iter != None:
             iter = model.remove(iter)
@@ -213,7 +230,8 @@ class PyrenamerPatternEditor:
     def on_pattern_edit_edit_clicked(self, widget):
 
         # Get data from treeview
-        selection = self.builder.get_object('pattern_edit_treeview').get_selection()
+        selection = self.builder.get_object(
+            'pattern_edit_treeview').get_selection()
         model, iter = selection.get_selected()
         if iter != None:
             data = model.get_value(iter, 0)
@@ -240,14 +258,16 @@ class PyrenamerPatternEditor:
 
 
     def on_pattern_edit_up_clicked(self, widget):
-        model, iter = self.builder.get_object('pattern_edit_treeview').get_selection().get_selected()
+        model, iter = self.builder.get_object(
+            'pattern_edit_treeview').get_selection().get_selected()
         iter_prev = self.iter_prev(model, iter)
         if iter_prev != None:
             model.swap(iter, iter_prev)
 
 
     def on_pattern_edit_down_clicked(self, widget):
-        model, iter = self.builder.get_object('pattern_edit_treeview').get_selection().get_selected()
+        model, iter = self.builder.get_object(
+            'pattern_edit_treeview').get_selection().get_selected()
         iter_next = model.iter_next(iter)
         if iter_next != None:
             model.swap(iter, iter_next)
@@ -265,8 +285,10 @@ class PyrenamerPatternEditor:
     def on_pattern_edit_treeview_button_press_event(self, widget, event):
         """ If clicked in a clean part of the listview, unselect all rows """
         x, y = event.get_coords()
-        if self.builder.get_object('pattern_edit_treeview').get_path_at_pos(int(x), int(y)) == None:
-            self.builder.get_object('pattern_edit_treeview').get_selection().unselect_all()
+        if self.builder.get_object('pattern_edit_treeview').get_path_at_pos(
+                int(x), int(y)) == None:
+            self.builder.get_object(
+                'pattern_edit_treeview').get_selection().unselect_all()
 
 
     def iter_prev(self, model, iter):
@@ -281,9 +303,9 @@ class PyrenamerPatternEditor:
         """ Create pattern add dialog and connect signals """
 
         # Create the dialog
-        
-        tree = self.builder.add_objects_from_file(self.glade_file,
-                                                  ['add_pattern_dialog', 'add_pattern_entry'])
+
+        tree = self.builder.add_objects_from_file(
+            self.glade_file, ['add_pattern_dialog', 'add_pattern_entry'])
 
         # Get widgets
         dialog = self.builder.get_object('add_pattern_dialog')

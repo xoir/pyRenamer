@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-""" Mass file renamer for GNOME"""
+"""
+pyRenamer - Mass file renamer for GNOME 
+
+Copyright © 2006-08, 16 Adolfo González Blázquez
+Copyright © 2016 Thomas Freeman
+
+This is free software; see the source code for copying conditions.
+There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.
+"""
 
 __authors__ = [
     'Adolfo González Blázquez <code@infinicode.org>',
@@ -57,7 +66,9 @@ from tools import undo
 config_dir = os.path.join(os.path.expanduser('~'), 'config/pyRenamer')
 
 class pyRenamer:
+    """ The main class for the pyRenamer program """
 
+    
     def __init__(self, root_dir=None, active_dir=None):
         """ Create an instance of the pyRenamer program """
 
@@ -339,7 +350,6 @@ class pyRenamer:
 
         self.selected_files.show()
 
-
     def rename_rows(self, model, path, iter, user_data):
         """ This function is called by foreach to rename files on every row """
         ori = model.get_value(iter, 1)
@@ -354,7 +364,6 @@ class pyRenamer:
                             ori, new, error))
             else:
                 self.undo_manager.add(ori, new)
-
 
     def preview_rename_rows(self, model, path, iter, paths):
         """ Called when Preview button is clicked.
@@ -464,7 +473,6 @@ class pyRenamer:
             model.set_value(iter, 3, None)
         self.count += 1
 
-
     def preview_selected_row(self):
         """ Preview just selected row """
 
@@ -489,7 +497,6 @@ class pyRenamer:
             model.set_value(iter, 3, None)
         self.count += 1
 
-
     def preview_clear(self, model, path, iter, paths):
         """ Clean a row """
 
@@ -498,7 +505,6 @@ class pyRenamer:
 
         model.set_value(iter, 2, None)
         model.set_value(iter, 3, None)
-
 
     def enable_rename_and_clean(self, model, path, iter):
         """ Check if the rename button and menu should be enabled """
@@ -515,10 +521,8 @@ class pyRenamer:
 
         return False
 
-
 #---------------------------------------------------------------------------------------
 # Callbacks
-
 
     def on_selected_files_cursor_changed(self, treeview):
         """ Clicked a file """
@@ -536,12 +540,10 @@ class pyRenamer:
                     self.builder.get_object('manual').set_text(name)
             except: pass
 
-
     def on_stop_button_clicked(self, widget):
         """ The stop button on Statusbar.
         Stop adding items to the selected files list and show information on statusbar """
         self.populate_stop()
-
 
     def on_main_window_window_state_event(self, window, event):
         """ Thrown when window is maximized or demaximized """
@@ -554,14 +556,12 @@ class pyRenamer:
                 self.window_maximized = False
                 self.builder.get_object('main_window').set_has_resize_grip(True)
 
-
     def on_main_window_configure_event(self, window, event):
         """ Saving window size to avoid losing data when it gets destroyed """
         self.window_width, self.window_height = self.builder.get_object(
             "main_window").get_size()
         self.window_posx, self.window_posy = self.builder.get_object(
             "main_window").get_position()
-
 
     def on_rename_button_clicked(self, widget):
         """ For everyrow rename the files as requested """
@@ -576,7 +576,6 @@ class pyRenamer:
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
         self.ignore_errors = False
-
 
     def on_preview_button_clicked(self, widget):
         """ Set the item count to zero and get new names and paths for files on
@@ -593,7 +592,6 @@ class pyRenamer:
         self.builder.get_object('rename_button').set_sensitive(True)
         self.builder.get_object('menu_rename').set_sensitive(True)
         self.file_selected_model.foreach(self.enable_rename_and_clean)
-
 
     def on_clean_button_clicked(self, widget):
         """ Clean the previewed filenames """
@@ -630,6 +628,7 @@ class pyRenamer:
         self.options_panel_state(not self.options_shown)
 
     def options_panel_state(self, state):
+        """ Show or hide the options panel in the main window  """
 
         if state:
             self.builder.get_object('options_vbox').show()
@@ -645,11 +644,9 @@ class pyRenamer:
         self.options_shown = state
         self.builder.get_object('menu_show_options').set_active(state)
 
-
     def on_file_pattern_changed(self, widget):
         """ Reload the current dir 'cause we need it """
         self.dir_reload_current()
-
 
     def on_original_pattern_changed(self, widget):
         """ Reload current dir and disable Rename button """
@@ -665,7 +662,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_subs_spaces_toggled(self, widget):
         """ Enable/Disable spaces combo """
         self.builder.get_object('subs_spaces_combo').set_sensitive(
@@ -675,7 +671,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_subs_capitalization_toggled(self, widget):
         """ Enable/Disable caps combo """
         self.builder.get_object('subs_capitalization_combo').set_sensitive(
@@ -684,7 +679,6 @@ class pyRenamer:
         self.builder.get_object('menu_rename').set_sensitive(False)
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_subs_replace_toggled(self, widget):
         """ Enable/Disable replace with text entries """
@@ -699,14 +693,12 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_subs_spaces_combo_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_subs_capitalization_combo_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
@@ -715,7 +707,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_subs_replace_orig_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
@@ -723,14 +714,12 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_subs_replace_new_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_subs_accents_toggled(self, widget):
         """ Enable/Disable accents """
@@ -746,7 +735,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_insert_radio_toggled(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
@@ -759,7 +747,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_insert_entry_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
@@ -767,14 +754,12 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_insert_pos_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_insert_end_toggled(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
@@ -784,7 +769,6 @@ class pyRenamer:
             not self.builder.get_object('insert_end').get_active())
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_delete_radio_toggled(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
@@ -797,7 +781,6 @@ class pyRenamer:
         self.builder.get_object('insert_end').set_sensitive(False)
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_delete_from_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
@@ -905,15 +888,13 @@ class pyRenamer:
         # And show it on combobox
         self.builder.get_object('original_pattern_combo').append_text(text)
 
-
     def on_pattern_ori_edit_clicked(self, widget):
         pe = pattern_editor.PyrenamerPatternEditor(
             self, config_dir, self.glade_file)
         pe.create_window('main_ori')
 
-
     def on_pattern_dest_save_clicked(self, widget):
-
+        
         # Get the pattern value
         text = self.builder.get_object('renamed_pattern').get_text()
 
@@ -929,35 +910,43 @@ class pyRenamer:
         # And show it on combobox
         self.builder.get_object('renamed_pattern_combo').append_text(text)
 
-
     def on_pattern_dest_edit_clicked(self, widget):
+        """ Open the pattern edit window in reponse to a user click """
+
         pe = pattern_editor.PyrenamerPatternEditor(
             self, config_dir, self.glade_file)
         pe.create_window('main_dest')
 
-
     def on_original_pattern_combo_changed (self, widget):
         """ Change text displayed in the original pattern combo box to reflect
         the currently selected pattern """
+
         text = widget.get_active_text()
+        if text == None:
+            combo.set_active(0)
+            text = combo.get_active_text()
+
         widget.get_child().set_text(text)
         self.patterns_default["main_ori"] = text
-
 
     def on_renamed_pattern_combo_changed (self, widget):
         """ Change text displayed in the renamed pattern combo box to reflect
         the currently selected pattern """
+
         text = widget.get_active_text()
+        if text == None:
+            combo.set_active(0)
+            text = combo.get_active_text()
+
         widget.get_child().set_text(text)
         self.patterns_default["main_dest"] = text
 
-
     def on_notebook_switch_page(self, notebook, page, page_num):
         """ Select a different tab in the notebook in the main window """
+
         if page_num != 3:
             self.selected_files.get_selection().set_mode(
                 Gtk.SelectionMode.MULTIPLE)
-
         else:
             # Manual rename
             try:
@@ -972,13 +961,11 @@ class pyRenamer:
                     self.builder.get_object('manual').set_text(name)
             except: pass
 
-
     def on_copy_activate(self, widget):
         """ Copy to clipboard """
         w = self.builder.get_object('main_window').get_focus()
         if isinstance(w, Gtk.Entry):
             w.emit('copy-clipboard')
-
 
     def on_paste_activate(self, widget):
         """ Paste from clipboard """
@@ -986,13 +973,11 @@ class pyRenamer:
         if isinstance(w, Gtk.Entry):
             w.emit('paste-clipboard')
 
-
     def on_cut_activate(self, widget):
         """ Cut to clipboard """
         w = self.builder.get_object('main_window').get_focus()
         if isinstance(w, Gtk.Entry):
             w.emit('cut-clipboard')
-
 
     def on_clear_activate(self, widget):
         """ Clear text widget """
@@ -1000,13 +985,11 @@ class pyRenamer:
         if isinstance(w, Gtk.Entry):
             w.set_text('')
 
-
     def on_select_all_activate(self, widget):
         """ Select every row on selected-files treeview """
         if self.builder.get_object('notebook').get_current_page() == 3:
             self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         self.selected_files.get_selection().select_all()
-
 
     def on_select_nothing_activate(self, widget):
         """ Select nothing on selected-files treeview """
@@ -1014,11 +997,9 @@ class pyRenamer:
             self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         self.selected_files.get_selection().unselect_all()
 
-
     def on_preferences_activate(self, widget):
         """ Preferences menu item clicked """
         self.prefs.create_preferences_dialog(self.glade_file, self.icon)
-
 
     def on_manual_key_press_event(self, widget, event):
         """ Key pressed on manual rename entry """
@@ -1325,11 +1306,6 @@ class pyRenamer:
         about.set_wrap_license(True)
         about.set_comments(__doc__)
         about.set_copyright(__copyright__)
-
-        def openHomePage(widget,url,url2):
-            import webbrowser
-            webbrowser.open_new(url)
-
         about.set_website('https://github.com/tfree87/pyRenamer')
         about.set_icon_from_file(self.icon)
         about.run()
@@ -1338,7 +1314,11 @@ class pyRenamer:
 
 def parse_arguments():
     """Read arguments from the command line"""
-    parser = argparse.ArgumentParser(description=__doc__)
+
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("-r", "--root_dir",
                         help="Start pyRenamer with a new root dir")
     parser.add_argument("-s", "--active_dir",
@@ -1348,11 +1328,16 @@ def parse_arguments():
 
 
 def main():
+    """ Start the pyRenamer program"""
+
     args = parse_arguments() # Parse arguments
     GObject.threads_init() # Start threading
     py = pyRenamer(args.root_dir, args.active_dir) # Initialize program
     Gtk.main()
-    
+
 
 if __name__ == '__main__':
+    """ If this file is executed, then run main() to start the pyRenamer
+    program"""
+
     main()
