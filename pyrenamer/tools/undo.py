@@ -22,7 +22,7 @@ If you find any bugs or have any suggestions email: code@infinicode.org
 
 from tools import filetools as renamerfilefuncs
 
-class PyrenamerUndo:
+class Undo:
 
     def __init__(self):
         self.undo_memory = []

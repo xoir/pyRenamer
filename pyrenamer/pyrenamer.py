@@ -6,7 +6,7 @@ __authors__ = [
     'Thomas Freeman <tfree87@users.noreply.github.com>'
     ]
 __artists__ = ['Adolfo González Blázquez <code@infinicode.org>']
-__copyright__ = """Copyright © 2006-08 Adolfo González Blázquez\n
+__copyright__ = """Copyright © 2006-08, 16 Adolfo González Blázquez\n
         Copyright © 2016 Thomas Freeman"""
 __credits__ = [
     'Adolfo González Blázquez <code@infinicode.org>',
@@ -30,6 +30,7 @@ __maintainer__ = "Thomas Freeman"
 __email__ = "tfree87@users.noreply.github.com"
 __status__ = "Beta"
 
+# Global Imports
 import argparse
 import gi 
 gi.require_version('Gtk', '3.0')
@@ -46,8 +47,8 @@ import gettext
 from gettext import gettext as _
 
 # Local Imports
-from gui import pyrenamer_prefs
-from gui import pyrenamer_pattern_editor
+from gui import preferences
+from gui import pattern_editor
 from gui import menu
 from treefilebrowser import treefilebrowser
 from tools import filetools as renamerfilefuncs
@@ -58,6 +59,7 @@ config_dir = os.path.join(os.path.expanduser('~'), 'config/pyRenamer')
 class pyRenamer:
 
     def __init__(self, root_dir=None, active_dir=None):
+        """ Create an instance of the pyRenamer program """
 
         self.menu = menu.PyrenamerMenuCB(self)
         self.project_dir = dirname(dirname(os.path.abspath(__file__)))
@@ -77,7 +79,7 @@ class pyRenamer:
             "main_ori": "",
             "main_dest": ""
         }
-        
+
         # Directories variables
         self.home = os.path.expanduser('~')
         self.root_dir = '/'
@@ -90,7 +92,7 @@ class pyRenamer:
         self.autopreview = False
 
         # Read preferences
-        self.prefs = pyrenamer_prefs.PyrenamerPrefs(self, config_dir)
+        self.prefs = preferences.PyrenamerPrefs(self, config_dir)
         self.prefs.load_preferences()
 
         # Read GUI data from XML
@@ -137,7 +139,7 @@ class pyRenamer:
             'menu_undo',
             'menu_redo',
             ]
-            
+
         self.builder = Gtk.Builder()
         self.builder.add_objects_from_file(self.glade_file, gui_objects)
         self.initialize_defaults()
@@ -145,12 +147,13 @@ class pyRenamer:
             self.root_dir = root_dir
         if active_dir != None:
             self.active_dir = active_dir
-        
-        # Create selected files treeview
+
+            # Create selected files treeview
         self.selected_files, selected_files_scrolled = self.create_selected_files_treeview()
 
-        self.statusbar_context = self.builder.get_object('statusbar').get_context_id("file_renamer")
-        
+        self.statusbar_context = self.builder.get_object(
+            'statusbar').get_context_id("file_renamer")
+
         # Get defined signals
         signals = { "on_main_window_destroy": self.on_main_quit,
                     "on_main_window_window_state_event": self.on_main_window_window_state_event,
@@ -222,7 +225,7 @@ class pyRenamer:
         self.progressbar.set_pulse_step(0.01)
         self.progressbar.set_size_request(-1,14)
         self.progressbar_vbox = Gtk.VBox()
-        self.progressbar_vbox.pack_start(self.progressbar, True, 0, 0)
+        self.progressbar_vbox.pack_end(self.progressbar, True, 0, 0)
         self.progressbar_vbox.set_homogeneous(True)
         self.stop_button = Gtk.Button()
         self.stop_button.set_relief(Gtk.ReliefStyle.NONE)
@@ -233,8 +236,8 @@ class pyRenamer:
         self.stop_button.connect("clicked", self.on_stop_button_clicked)
         self.stop_button.set_image(stop_image)
 
-        self.builder.get_object('statusbar').pack_start(self.stop_button,True,0,0)
-        self.builder.get_object('statusbar').pack_start(self.progressbar_vbox,True,0,0)
+        self.builder.get_object('statusbar').pack_end(self.progressbar_vbox,True,0,0)
+        self.builder.get_object('statusbar').pack_end(self.stop_button,True,0,0)
         self.builder.get_object('statusbar').set_size_request(-1,20)
         self.builder.get_object('statusbar').show_all()
         self.stop_button.hide()
@@ -243,7 +246,7 @@ class pyRenamer:
         self.builder.get_object('main_window').set_title('pyRenamer')
         self.builder.get_object('main_window').set_has_resize_grip(True)
         self.builder.get_object('main_window').set_icon_from_file(self.icon)
-        
+
         # Init TreeFileBrowser
         self.file_browser = treefilebrowser.TreeFileBrowser(self.root_dir)
         self.file_browser_view = self.file_browser.get_view()
@@ -251,8 +254,10 @@ class pyRenamer:
         signal = self.file_browser.connect("cursor-changed", self.dir_selected)
 
         # Add dirs and files tomain window
-        self.builder.get_object('main_hpaned').pack1(file_browser_scrolled, resize=True, shrink=False)
-        self.builder.get_object('main_hpaned').pack2(selected_files_scrolled, resize=True, shrink=False)
+        self.builder.get_object('main_hpaned').pack1(
+            file_browser_scrolled, resize=True, shrink=False)
+        self.builder.get_object('main_hpaned').pack2(
+            selected_files_scrolled, resize=True, shrink=False)
 
         # Create model and add dirs
         self.create_model()
@@ -262,7 +267,7 @@ class pyRenamer:
             # Check if the dir is hidden
             if "/." in (self.active_dir or self.root_dir):
                 self.file_browser.set_show_hidden(True)
-                
+
             # Check if paths are correct
             if not self.file_browser.check_active_dir(self.active_dir):
                 self.active_dir = self.home
@@ -288,12 +293,13 @@ class pyRenamer:
         self.populate_pattern_combos()
 
         # # Init the undo/redo manager
-        self.undo_manager = undo.PyrenamerUndo()
+        self.undo_manager = undo.Undo()
         self.builder.get_object('menu_undo').set_sensitive(False)
         self.builder.get_object('menu_redo').set_sensitive(False)
 
     def create_selected_files_treeview(self):
-        """ Create the TreeView and the ScrolledWindow for the selected files """
+        """ Create the TreeView and the ScrolledWindow for the selected
+        files """
         view = Gtk.TreeView()
         view.set_headers_visible(True)
         view.set_enable_search(True)
@@ -314,7 +320,8 @@ class pyRenamer:
     def create_model(self):
         """ Create the model to hold the needed data
         Model = [file, /path/to/file, newfilename, /path/to/newfilename] """
-        self.file_selected_model = Gtk.TreeStore(str, str, str, str, GdkPixbuf.Pixbuf)
+        self.file_selected_model = Gtk.TreeStore(
+            str, str, str, str, GdkPixbuf.Pixbuf)
         self.selected_files.set_model(self.file_selected_model)
 
         renderer0 = Gtk.CellRendererPixbuf()
@@ -342,7 +349,9 @@ class pyRenamer:
             result, error = renamerfilefuncs.rename_file(ori, new)
             if not result:
                 if not self.ignore_errors:
-                    self.display_error_dialog(_("Could not rename file %s to %s\n%s") % (ori, new, error))
+                    self.display_error_dialog(_(
+                        "Could not rename file %s to %s\n%s") % (
+                            ori, new, error))
             else:
                 self.undo_manager.add(ori, new)
 
@@ -362,7 +371,8 @@ class pyRenamer:
         newpath = path
 
         # Keep extension (not valid on manual rename!)
-        if self.keepext and self.builder.get_object('notebook').get_current_page() != 3:
+        if self.keepext and self.builder.get_object(
+                'notebook').get_current_page() != 3:
             ename, epath, ext = renamerfilefuncs.cut_extension(newname, newpath)
             if ext != '':
                 newname = ename
@@ -372,26 +382,37 @@ class pyRenamer:
             # Replace using patterns
             pattern_ini = self.builder.get_object('original_pattern').get_text()
             pattern_end = self.builder.get_object('renamed_pattern').get_text()
-            newname, newpath = renamerfilefuncs.rename_using_patterns(newname, newpath, pattern_ini, pattern_end, self.count)
+            newname, newpath = renamerfilefuncs.rename_using_patterns(
+                newname, newpath, pattern_ini, pattern_end, self.count)
 
         elif self.builder.get_object('notebook').get_current_page() == 1:
             # Replace spaces
-            if self.builder.get_object('subs_spaces').get_active() and newname != None:
-                newname, newpath = renamerfilefuncs.replace_spaces(newname, newpath, self.builder.get_object('subs_spaces_combo').get_active())
+            if self.builder.get_object(
+                    'subs_spaces').get_active() and newname != None:
+                newname, newpath = renamerfilefuncs.replace_spaces(
+                    newname, newpath, self.builder.get_object(
+                        'subs_spaces_combo').get_active())
 
             # Replace orig with new
-            if self.builder.get_object('subs_replace').get_active() and newname != None:
+            if self.builder.get_object(
+                    'subs_replace').get_active() and newname != None:
                 orig = self.builder.get_object('subs_replace_orig').get_text()
                 new = self.builder.get_object('subs_replace_new').get_text()
-                newname, newpath = renamerfilefuncs.replace_with(newname, newpath, orig, new)
+                newname, newpath = renamerfilefuncs.replace_with(
+                    newname, newpath, orig, new)
 
             # Replace capitalization
-            if self.builder.get_object('subs_capitalization').get_active() and newname != None:
-                newname, newpath = renamerfilefuncs.replace_capitalization(newname, newpath, self.builder.get_object('subs_capitalization_combo').get_active())
+            if self.builder.get_object(
+                    'subs_capitalization').get_active() and newname != None:
+                newname, newpath = renamerfilefuncs.replace_capitalization(
+                    newname, newpath, self.builder.get_object(
+                        'subs_capitalization_combo').get_active())
 
             # Replace accents
-            if self.builder.get_object('subs_accents').get_active() and newname != None:
-                newname, newpath = renamerfilefuncs.replace_accents(newname, newpath)
+            if self.builder.get_object(
+                    'subs_accents').get_active() and newname != None:
+                newname, newpath = renamerfilefuncs.replace_accents(
+                    newname, newpath)
 
             # Fix duplicated symbols
             if self.builder.get_object('subs_duplicated').get_active() and newname != None:
@@ -423,12 +444,16 @@ class pyRenamer:
                 else:
                     newname = model.get_value(iter, 2)
                     newpath = model.get_value(iter, 3)
-            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
+            self.selected_files.get_selection().set_mode(
+                Gtk.SelectionMode.MULTIPLE)
 
-            
+
         # Add the kept extension
-        if self.keepext and self.builder.get_object('notebook').get_current_page() != 3 and (newname and newpath) != '':
-            if ext != '': newname, newpath = renamerfilefuncs.add_extension(newname, newpath, ext)
+        if self.keepext and self.builder.get_object(
+                'notebook').get_current_page() != 3 and (
+                    newname and newpath) != '':
+            if ext != '': newname, newpath = renamerfilefuncs.add_extension(
+                    newname, newpath, ext)
 
         # Set new values on model
         if newname != '' and newname != None:
@@ -523,7 +548,8 @@ class pyRenamer:
         if event.changed_mask & Gdk.WindowState.MAXIMIZED:
             if event.new_window_state & Gdk.WindowState.MAXIMIZED:
                 self.window_maximized = True
-                self.builder.get_object('main_window').set_has_resize_grip(False)
+                self.builder.get_object(
+                    'main_window').set_has_resize_grip(False)
             else:
                 self.window_maximized = False
                 self.builder.get_object('main_window').set_has_resize_grip(True)
@@ -531,8 +557,10 @@ class pyRenamer:
 
     def on_main_window_configure_event(self, window, event):
         """ Saving window size to avoid losing data when it gets destroyed """
-        self.window_width, self.window_height = self.builder.get_object("main_window").get_size()
-        self.window_posx, self.window_posy = self.builder.get_object("main_window").get_position()
+        self.window_width, self.window_height = self.builder.get_object(
+            "main_window").get_size()
+        self.window_posx, self.window_posy = self.builder.get_object(
+            "main_window").get_position()
 
 
     def on_rename_button_clicked(self, widget):
@@ -551,7 +579,8 @@ class pyRenamer:
 
 
     def on_preview_button_clicked(self, widget):
-        """ Set the item count to zero and get new names and paths for files on model """
+        """ Set the item count to zero and get new names and paths for files on
+        model """
         self.count = 0
 
         # Get selected rows and execute rename function
@@ -581,7 +610,8 @@ class pyRenamer:
         if self.builder.get_object('notebook').get_current_page() == 3:
             # Manual rename
             try:
-                self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
+                self.selected_files.get_selection().set_mode(
+                    Gtk.SelectionMode.SINGLE)
                 model, iter = self.selected_files.get_selection().get_selected()
                 name = model.get_value(iter,0)
                 newname = model.get_value(iter,2)
@@ -591,7 +621,6 @@ class pyRenamer:
                     self.builder.get_object('manual').set_text(name)
             except:
                 pass
-
 
     def on_main_hpaned_notify(self, pane, gparamspec):
         if gparamspec.name == 'position':
@@ -629,7 +658,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def on_renamed_pattern_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
@@ -640,7 +668,8 @@ class pyRenamer:
 
     def on_subs_spaces_toggled(self, widget):
         """ Enable/Disable spaces combo """
-        self.builder.get_object('subs_spaces_combo').set_sensitive(widget.get_active())
+        self.builder.get_object('subs_spaces_combo').set_sensitive(
+            widget.get_active())
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
         if self.autopreview:
@@ -649,7 +678,8 @@ class pyRenamer:
 
     def on_subs_capitalization_toggled(self, widget):
         """ Enable/Disable caps combo """
-        self.builder.get_object('subs_capitalization_combo').set_sensitive(widget.get_active())
+        self.builder.get_object('subs_capitalization_combo').set_sensitive(
+            widget.get_active())
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
         if self.autopreview:
@@ -660,9 +690,12 @@ class pyRenamer:
         """ Enable/Disable replace with text entries """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
-        self.builder.get_object('subs_replace_new').set_sensitive(widget.get_active())
-        self.builder.get_object('subs_replace_orig').set_sensitive(widget.get_active())
-        self.builder.get_object('subs_replace_label').set_sensitive(widget.get_active())
+        self.builder.get_object('subs_replace_new').set_sensitive(
+            widget.get_active())
+        self.builder.get_object('subs_replace_orig').set_sensitive(
+            widget.get_active())
+        self.builder.get_object('subs_replace_label').set_sensitive(
+            widget.get_active())
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
@@ -747,7 +780,8 @@ class pyRenamer:
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
-        self.builder.get_object('insert_pos').set_sensitive(not self.builder.get_object('insert_end').get_active())
+        self.builder.get_object('insert_pos').set_sensitive(
+            not self.builder.get_object('insert_end').get_active())
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
@@ -769,18 +803,25 @@ class pyRenamer:
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
-        if self.builder.get_object('delete_from').get_value() > self.builder.get_object('delete_to').get_value():
-            self.builder.get_object('delete_from').set_value(self.builder.get_object('delete_to').get_value())
+        if self.builder.get_object(
+                'delete_from').get_value() > self.builder.get_object(
+                    'delete_to').get_value():
+            self.builder.get_object(
+                'delete_from').set_value(self.builder.get_object(
+                    'delete_to').get_value())
         if self.autopreview:
             self.on_preview_button_clicked(None)
-
 
     def on_delete_to_changed(self, widget):
         """ Disable Rename button (user has to click on Preview again) """
         self.builder.get_object('rename_button').set_sensitive(False)
         self.builder.get_object('menu_rename').set_sensitive(False)
-        if self.builder.get_object('delete_to').get_value() < self.builder.get_object('delete_from').get_value():
-            self.builder.get_object('delete_to').set_value(self.builder.get_object('delete_from').get_value())
+        if self.builder.get_object(
+                'delete_to').get_value() < self.builder.get_object(
+                    'delete_from').get_value():
+            self.builder.get_object(
+                'delete_to').set_value(self.builder.get_object(
+                    'delete_from').get_value())
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
@@ -791,7 +832,6 @@ class pyRenamer:
         if self.autopreview:
             self.on_preview_button_clicked(None)
 
-
     def populate_pattern_combos(self):
         """ Populate pattern combo boxes """
 
@@ -800,11 +840,11 @@ class pyRenamer:
         self.builder.get_object('original_pattern_combo').get_model().clear()
         self.builder.get_object('renamed_pattern_combo').get_model().clear()
 
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
+        pe = pattern_editor.PyrenamerPatternEditor(
+            self, config_dir, self.glade_file)
         main_ori = pe.get_patterns('main_ori')
         main_dest = pe.get_patterns('main_dest')
 
-        
         def set_combo_element(combo, newtext):
             pos = 0
             try:
@@ -822,25 +862,30 @@ class pyRenamer:
             text = combo.get_active_text()
             if pos >= 0:
                 combo.set_active(pos)
+                text = combo.get_active_text()
             elif text == '':
                 combo.set_active(0)
-            else:
-                # Figure out what text to place here
-                combo.get_child().set_text('TEXT')
+                text = combo.get_active_text()
+            elif text == None:
+                combo.set_active(0)
+                text = combo.get_active_text()
 
+            # Figure out what text to place here
+            combo.get_child().set_text(text)
 
         # Main original
         for p in main_ori:
             self.builder.get_object('original_pattern_combo').append_text(p)
-        set_combo_element(self.builder.get_object('original_pattern_combo'), self.patterns_default["main_ori"])
+        set_combo_element(self.builder.get_object(
+            'original_pattern_combo'), self.patterns_default["main_ori"])
         self.patterns["main_ori"] = main_ori
 
         # Main renamed
         for p in main_dest:
             self.builder.get_object('renamed_pattern_combo').append_text(p)
-        set_combo_element(self.builder.get_object('renamed_pattern_combo'), self.patterns_default["main_dest"])
+        set_combo_element(self.builder.get_object(
+            'renamed_pattern_combo'), self.patterns_default["main_dest"])
         self.patterns["main_dest"] = main_dest
-
 
     def on_pattern_ori_save_clicked(self, widget):
 
@@ -848,7 +893,8 @@ class pyRenamer:
         text = self.builder.get_object('original_pattern').get_text()
 
         # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
+        pe = pattern_editor.PyrenamerPatternEditor(
+            self, config_dir, self.glade_file)
         pe.add_pattern('main_ori', text)
 
         # Add it to the variable
@@ -861,7 +907,8 @@ class pyRenamer:
 
 
     def on_pattern_ori_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
+        pe = pattern_editor.PyrenamerPatternEditor(
+            self, config_dir, self.glade_file)
         pe.create_window('main_ori')
 
 
@@ -871,7 +918,7 @@ class pyRenamer:
         text = self.builder.get_object('renamed_pattern').get_text()
 
         # Add it to the local file
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self)
+        pe = pattern_editor.PyrenamerPatternEditor(self)
         pe.add_pattern('main_dest', text)
 
         # Add it to the variable
@@ -884,29 +931,38 @@ class pyRenamer:
 
 
     def on_pattern_dest_edit_clicked(self, widget):
-        pe = pyrenamer_pattern_editor.PyrenamerPatternEditor(self, config_dir, self.glade_file)
+        pe = pattern_editor.PyrenamerPatternEditor(
+            self, config_dir, self.glade_file)
         pe.create_window('main_dest')
 
 
     def on_original_pattern_combo_changed (self, widget):
+        """ Change text displayed in the original pattern combo box to reflect
+        the currently selected pattern """
         text = widget.get_active_text()
+        widget.get_child().set_text(text)
         self.patterns_default["main_ori"] = text
 
 
     def on_renamed_pattern_combo_changed (self, widget):
+        """ Change text displayed in the renamed pattern combo box to reflect
+        the currently selected pattern """
         text = widget.get_active_text()
+        widget.get_child().set_text(text)
         self.patterns_default["main_dest"] = text
 
 
     def on_notebook_switch_page(self, notebook, page, page_num):
-        """ Tab changed """
+        """ Select a different tab in the notebook in the main window """
         if page_num != 3:
-            self.selected_files.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
+            self.selected_files.get_selection().set_mode(
+                Gtk.SelectionMode.MULTIPLE)
 
         else:
             # Manual rename
             try:
-                self.selected_files.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
+                self.selected_files.get_selection().set_mode(
+                    Gtk.SelectionMode.SINGLE)
                 model, iter = self.selected_files.get_selection().get_selected()
                 name = model.get_value(iter,0)
                 newname = model.get_value(iter,2)
@@ -1278,6 +1334,7 @@ class pyRenamer:
         about.set_icon_from_file(self.icon)
         about.run()
         about.destroy()
+
 
 def parse_arguments():
     """Read arguments from the command line"""
