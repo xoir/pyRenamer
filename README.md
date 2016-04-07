@@ -34,6 +34,7 @@ More info on: http://www.infinicode.org/code/pyrenamer/
 ##Authors
 
 Adolfo González Blázquez <code@infinicode.org>
+
 Thomas Freeman <tfree87@users.noreply.github.com>
 
 ## TreeFileBrowser
