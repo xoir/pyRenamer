@@ -1,5 +1,4 @@
-pyRenamer
-=========
+# pyRenamer
 
 pyRenamer is an application for mass renaming files.
 
@@ -25,8 +24,9 @@ optional arguments:
 ## Website
   More info on: http://www.infinicode.org/code/pyrenamer/
 
-##Author
+##Authors
   Adolfo González Blázquez <code@infinicode.org>
+  Thomas Freeman <tfree87@users.noreply.github.com>
 
 ## TreeFileBrowser
   pyRenamer uses a widget called treefilebrowser.py, which is a tree-like file browser, just like the one on the Nautilus side bar. You can see its source code on src/treefilebrowser.py. There's an example on how to use it on doc/treefilebrowser_example.py

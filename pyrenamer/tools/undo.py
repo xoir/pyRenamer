@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-2007, 2016 Adolfo González Blázquez <code@infinicode.org>
+undo.py - Undo class for the pyRenamer mass file renamer to provide undo
+functionality to revert renamed files
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+Copyright © 2016 Thomas Freeman <tfree87@users.noreply.github.com>
+Copyright © 2006-2008 Adolfo González Blázquez <code@infinicode.org>
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 2 of the License, or (at your option) any later
+version.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-If you find any bugs or have any suggestions email: code@infinicode.org
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
+# Local Imports
 from tools import filetools as renamerfilefuncs
 
 class Undo:

@@ -1,31 +1,37 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2006-2008 Adolfo González Blázquez <code@infinicode.org>
+menu.py - Menu class for the pyRenamer mass file renamer
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+Copyright © 2016 Thomas Freeman <tfree87@users.noreply.github.com>
+Copyright © 2006-2008 Adolfo González Blázquez <code@infinicode.org>
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 2 of the License, or (at your option) any later
+version.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-If you find any bugs or have any suggestions email: code@infinicode.org
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-class PyrenamerMenuCB:
+
+class Menu:
+    """ Set actions for the drop down options in the pyRenamer main window"""
 
     def __init__(self, main):
+        """ Create an instance of the menu class"""
+
+        # Get the main parent window
         self.main = main
 
     def on_menu_undo_activate(self, widget):
+        """ Assign the undo function to Edit > Undo option in the menu"""
+
         self.main.undo_manager.undo()
         self.main.dir_reload_current()
         self.main.menu_undo.set_sensitive(False)
@@ -52,12 +58,6 @@ class PyrenamerMenuCB:
 
     def on_menu_manual_activate(self, widget):
         self.main.builder.get_object('notebook').set_current_page(3)
-
-    def on_menu_images_activate(self, widget):
-        self.main.builder.get_object('notebook').set_current_page(4)
-
-    def on_menu_music_activate(self, widget):
-        self.main.builder.get_object('notebook').set_current_page(5)
 
     def on_menu_show_options_activate(self, widget):
         self.main.options_panel_state(widget.get_active())

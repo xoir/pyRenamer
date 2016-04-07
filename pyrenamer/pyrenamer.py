@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
-"""
-pyRenamer - Mass file renamer for GNOME 
 
-Copyright © 2006-08, 16 Adolfo González Blázquez
-Copyright © 2016 Thomas Freeman
-
-This is free software; see the source code for copying conditions.
-There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.
 """
+pyRenamer - Mass file renamer for GNOME
+
+Copyright © 2016 Thomas Freeman <tfree87@users.noreply.github.com>
+Copyright © 2006-2008 Adolfo González Blázquez <code@infinicode.org>
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 
 __authors__ = [
     'Adolfo González Blázquez <code@infinicode.org>',
@@ -21,23 +31,12 @@ __credits__ = [
     'Adolfo González Blázquez <code@infinicode.org>',
     'Thomas Freeman <tfree87@users.noreply.github.com>'
     ]
-__license__ = """
-This program is free software; you can redistribute it and/or modify \
-it under the terms of the GNU General Public License as published by \
-the Free Software Foundation; either version 2 of the License, or \
-(at your option) any later version. \n\n\
-This program is distributed in the hope that it will be useful, but \
-WITHOUT ANY WARRANTY; without even the implied warranty of \
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \
-See the GNU General Public License for more details. \n\n\
-You should have received a copy of the GNU General Public License \
-along with this program; if not, write to the Free Software Foundation, Inc., \
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA."
-"""
+__license__ = 'GPL v.2'
 __version__ = "0.6"
 __maintainer__ = "Thomas Freeman"
 __email__ = "tfree87@users.noreply.github.com"
 __status__ = "Beta"
+
 
 # Global Imports
 import argparse
@@ -55,6 +54,7 @@ import locale
 import gettext
 from gettext import gettext as _
 
+
 # Local Imports
 from gui import preferences
 from gui import pattern_editor
@@ -63,16 +63,17 @@ from treefilebrowser import treefilebrowser
 from tools import filetools as renamerfilefuncs
 from tools import undo
 
+
 config_dir = os.path.join(os.path.expanduser('~'), 'config/pyRenamer')
+
 
 class pyRenamer:
     """ The main class for the pyRenamer program """
-
     
     def __init__(self, root_dir=None, active_dir=None):
         """ Create an instance of the pyRenamer program """
 
-        self.menu = menu.PyrenamerMenuCB(self)
+        self.menu = menu.Menu(self)
         self.project_dir = dirname(dirname(os.path.abspath(__file__)))
         self.glade_file = ospath.join(self.project_dir, 'glade/pyrenamer.ui')
         self.icon = ospath.join(self.project_dir, 'images/pyrenamer.png')
@@ -103,7 +104,7 @@ class pyRenamer:
         self.autopreview = False
 
         # Read preferences
-        self.prefs = preferences.PyrenamerPrefs(self, config_dir)
+        self.prefs = preferences.Preferences(self, config_dir)
         self.prefs.load_preferences()
 
         # Read GUI data from XML
