@@ -13,7 +13,7 @@ pyRenamer is released under the terms of the GNU General Public License.
 
 ## Usage
 
-python3 usage: pyrenamer.py [-h] [-r ROOT_DIR] [-a ACTIVE_DIR]
+python3 pyrenamer.py [-h] [-r ROOT_DIR] [-a ACTIVE_DIR]
 
 optional arguments:
   -h, --help            show this help message and exit
