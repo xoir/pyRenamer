@@ -1320,10 +1320,10 @@ def parse_arguments():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("-r", "--root_dir",
-                        help="Start pyRenamer with a new root dir")
-    parser.add_argument("-s", "--active_dir",
-                help="Directory to select when pyRenamer starts")
+    parser.add_argument('-r', '--root_dir',
+        help='The root directory of the file tree when pyRenamer starts')
+    parser.add_argument('-a', '--active_dir',
+        help='Directory with files to be renamed when pyRenamer starts')
     args = parser.parse_args()
     return args
 

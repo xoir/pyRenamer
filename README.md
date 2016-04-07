@@ -13,14 +13,17 @@ pyRenamer is released under the terms of the GNU General Public License.
 
 ## Usage
 
-python3 pyrenamer.py [-h] [-r ROOT_DIR] [-s ACTIVE_DIR]
+python3 usage: pyrenamer.py [-h] [-r ROOT_DIR] [-a ACTIVE_DIR]
 
 optional arguments:
   -h, --help            show this help message and exit
   -r ROOT_DIR, --root_dir ROOT_DIR
-                        Start pyRenamer with a new root dir
-  -s ACTIVE_DIR, --active_dir ACTIVE_DIR
-                        Directory to select when pyRenamer starts
+                        The root directory of the file tree when pyRenamer
+                        starts
+  -a ACTIVE_DIR, --active_dir ACTIVE_DIR
+                        Directory with files to be renamed when pyRenamer
+                        starts
+
 ## Website
   More info on: http://www.infinicode.org/code/pyrenamer/
 
