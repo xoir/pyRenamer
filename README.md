@@ -13,6 +13,7 @@ pyRenamer is released under the terms of the GNU General Public License.
 
 ## Usage
 
+```
 python3 pyrenamer.py [-h] [-r ROOT_DIR] [-a ACTIVE_DIR]
 
 optional arguments:
@@ -23,6 +24,7 @@ optional arguments:
   -a ACTIVE_DIR, --active_dir ACTIVE_DIR
                         Directory with files to be renamed when pyRenamer
                         starts
+```
 
 ## Website
   More info on: http://www.infinicode.org/code/pyrenamer/
