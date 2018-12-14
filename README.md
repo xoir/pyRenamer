@@ -1,5 +1,7 @@
 # pyRenamer
 
+![](screenshots/screenshot.png)
+
 pyRenamer is an application for mass renaming files.
 
 You can rename files using patterns, substitutions, insert or delete text, or
