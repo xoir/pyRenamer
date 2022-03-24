@@ -430,15 +430,15 @@ class pyRenamer:
 
         elif self.builder.get_object('notebook').get_current_page() == 2:
             # Insert / delete
-            if self.insert_radio.get_active():
+            if self.builder.get_object('insert_radio').get_active():
                 text = self.builder.get_object('insert_entry').get_text()
                 if text != "":
                     if self.builder.get_object('insert_end').get_active():
-                        pos = None
+                        pos = -1
                     else:
                         pos = int(self.builder.get_object('insert_pos').get_value())-1
                     newname, newpath = renamerfilefuncs.insert_at(newname, newpath, text, pos)
-            elif self.delete_radio.get_active():
+            elif self.builder.get_object('delete_radio').get_active():
                 ini = int(self.builder.get_object('delete_from').get_value())-1
                 to = int(self.builder.get_object('delete_to').get_value())-1
                 newname, newpath = renamerfilefuncs.delete_from(newname, newpath, ini, to)
@@ -855,7 +855,7 @@ class pyRenamer:
                 text = combo.get_active_text()
 
             # Figure out what text to place here
-            combo.get_child().set_text(text)
+            # combo.get_child().set_text(text)
 
         # Main original
         for p in main_ori:
@@ -1332,7 +1332,7 @@ def main():
     """ Start the pyRenamer program"""
 
     args = parse_arguments() # Parse arguments
-    GObject.threads_init() # Start threading
+    # GObject.threads_init() # Start threading
     py = pyRenamer(args.root_dir, args.active_dir) # Initialize program
     Gtk.main()
 
