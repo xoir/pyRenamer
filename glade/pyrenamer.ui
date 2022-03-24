@@ -457,61 +457,6 @@
                     <property name="row-spacing">6</property>
                     <property name="column-spacing">6</property>
                     <child>
-                      <object class="GtkComboBoxText" id="renamed_pattern_combo">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">Use {1} for first catched item. {2} for second, etc...
-Use {num} for adding 1, 2, 3... to file names
-Use {num2} for 01, 02, 03.....
-Use {num3} for 001, 002, 003...
-Use {num+10} for 10, 11, 12...
-Use {num2+10} for 010, 011, 012...
-Use {dir} for getting current dir
-
-Some today date replacements:
-{date}			22feb1980
-{year}			1980
-{month}		02
-{monthname}	february
-{monthsimp}	feb
-{day}			22
-{dayname}		friday
-{daysimp}		fri
-
-* You can prefix these with 'create' or 'modify' to lookup the file attributes.
-
-Random number replacements:
-{rand} is random number between 0 and 100.
-{rand,3} is random number between 0 and 100 of 3 digits (012)
-{rand500} is random number between 0 and 500
-{rand10-20} is random number between 10 and 20
-{rand20,5} is random number between 0 and 20 of 5 digits (00012)</property>
-                        <signal name="changed" handler="on_renamed_pattern_combo_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">2</property>
-                        <property name="width">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBoxText" id="original_pattern_combo">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">{#}	Numbers
-{L}		Letters
-{C}		Characters (numbers and letters, not spaces)
-{X}		Numbers, letters, and spaces
-{@}	Trash </property>
-                        <signal name="changed" handler="on_original_pattern_combo_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">1</property>
-                        <property name="width">5</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="pattern_dest_edit">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
@@ -651,6 +596,80 @@ Random number replacements:
                       <packing>
                         <property name="left-attach">0</property>
                         <property name="top-attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="original_pattern_combo">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="tooltip-text" translatable="yes">{#}	Numbers
+{L}		Letters
+{C}		Characters (numbers and letters, not spaces)
+{X}		Numbers, letters, and spaces
+{@}	Trash </property>
+                        <property name="hexpand">True</property>
+                        <property name="active">0</property>
+                        <property name="has-entry">True</property>
+                        <signal name="changed" handler="on_original_pattern_combo_changed" swapped="no"/>
+                        <child internal-child="entry">
+                          <object class="GtkEntry">
+                            <property name="can-focus">True</property>
+                            <property name="double-buffered">False</property>
+                            <property name="hexpand">True</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">1</property>
+                        <property name="width">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="renamed_pattern_combo">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="tooltip-text" translatable="yes">Use {1} for first catched item. {2} for second, etc...
+Use {num} for adding 1, 2, 3... to file names
+Use {num2} for 01, 02, 03.....
+Use {num3} for 001, 002, 003...
+Use {num+10} for 10, 11, 12...
+Use {num2+10} for 010, 011, 012...
+Use {dir} for getting current dir
+
+Some today date replacements:
+{date}			22feb1980
+{year}			1980
+{month}		02
+{monthname}	february
+{monthsimp}	feb
+{day}			22
+{dayname}		friday
+{daysimp}		fri
+
+* You can prefix these with 'create' or 'modify' to lookup the file attributes.
+
+Random number replacements:
+{rand} is random number between 0 and 100.
+{rand,3} is random number between 0 and 100 of 3 digits (012)
+{rand500} is random number between 0 and 500
+{rand10-20} is random number between 10 and 20
+{rand20,5} is random number between 0 and 20 of 5 digits (00012)</property>
+                        <property name="hexpand">True</property>
+                        <property name="has-entry">True</property>
+                        <signal name="changed" handler="on_renamed_pattern_combo_changed" swapped="no"/>
+                        <child internal-child="entry">
+                          <object class="GtkEntry">
+                            <property name="can-focus">True</property>
+                            <property name="double-buffered">False</property>
+                            <property name="hexpand">True</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">2</property>
+                        <property name="width">5</property>
                       </packing>
                     </child>
                   </object>

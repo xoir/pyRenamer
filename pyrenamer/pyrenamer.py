@@ -390,8 +390,8 @@ class pyRenamer:
 
         if self.builder.get_object('notebook').get_current_page() == 0:
             # Replace using patterns
-            pattern_ini = self.builder.get_object('original_pattern').get_text()
-            pattern_end = self.builder.get_object('renamed_pattern').get_text()
+            pattern_ini = self.builder.get_object('original_pattern_combo').get_active_text()
+            pattern_end = self.builder.get_object('renamed_pattern_combo').get_active_text()
             newname, newpath = renamerfilefuncs.rename_using_patterns(
                 newname, newpath, pattern_ini, pattern_end, self.count)
 
