@@ -24,3 +24,14 @@ optional arguments:
                         Directory with files to be renamed when pyRenamer
                         starts
 ```
+
+## About This Repository
+pyRenamer has been around for a while and was once a common application in many Linux distributions. A while back, I made this branch as a chance to play around with Python and to update this program that I found so useful. Since then, it appears that much of the pyRenamer code has gone unmaintained so I am making an effort to revive the code and make pyRenamer a useful application once again. I believe pyRenamer still has some value and can be a useful tool for those who want to rename many files and may not be comfortable with command line tools.
+
+## Future
+The following items are where I plan to improve pyRenamer:
+
+- Remove all deprecated Gtk+ widgets
+- Add docstrings to methods using Numpydoc format
+- Reimplement the ability to rename music files with metadata
+- Reimplement the ability to rename image files with metadata
