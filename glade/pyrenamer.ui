@@ -292,71 +292,60 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAlignment" id="alignment11">
+                  <object class="GtkBox" id="options_vbox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
                     <child>
-                      <object class="GtkBox" id="options_vbox">
+                      <object class="GtkComboBox" id="filedir_combo">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="orientation">vertical</property>
-                        <property name="spacing">6</property>
+                        <property name="model">model1</property>
+                        <signal name="changed" handler="on_filedir_combo_changed" swapped="no"/>
                         <child>
-                          <object class="GtkComboBox" id="filedir_combo">
+                          <object class="GtkCellRendererText" id="renderer1"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="pattern_hbox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel" id="label1">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="model">model1</property>
-                            <signal name="changed" handler="on_filedir_combo_changed" swapped="no"/>
-                            <child>
-                              <object class="GtkCellRendererText" id="renderer1"/>
-                              <attributes>
-                                <attribute name="text">0</attribute>
-                              </attributes>
-                            </child>
+                            <property name="label" translatable="yes">Selection pattern</property>
+                            <property name="use-markup">True</property>
+                            <property name="xalign">0</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="fill">True</property>
+                            <property name="fill">False</property>
                             <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox" id="pattern_hbox">
+                          <object class="GtkEntry" id="file_pattern">
+                            <property name="width-request">75</property>
                             <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="spacing">12</property>
-                            <child>
-                              <object class="GtkLabel" id="label1">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Selection pattern</property>
-                                <property name="use-markup">True</property>
-                                <property name="xalign">0</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkEntry" id="file_pattern">
-                                <property name="width-request">75</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="tooltip-text" translatable="yes">*		Select every visible file
+                            <property name="can-focus">True</property>
+                            <property name="tooltip-text" translatable="yes">*		Select every visible file
 *.jpg	Select just files that end with the "jpg" extension
 		Select every file (including hidden ones)
 .*		Select files starting by "."</property>
-                                <property name="text" translatable="yes">*</property>
-                                <signal name="changed" handler="on_file_pattern_changed" swapped="no"/>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
+                            <property name="text" translatable="yes">*</property>
+                            <signal name="changed" handler="on_file_pattern_changed" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -364,55 +353,60 @@
                             <property name="position">1</property>
                           </packing>
                         </child>
-                        <child>
-                          <object class="GtkCheckButton" id="add_recursive">
-                            <property name="label" translatable="yes">Add files recursively</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="receives-default">False</property>
-                            <property name="use-underline">True</property>
-                            <property name="draw-indicator">True</property>
-                            <signal name="toggled" handler="on_add_recursive_toggled" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkCheckButton" id="extensions_check">
-                            <property name="label" translatable="yes">Keep extensions</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="receives-default">False</property>
-                            <property name="use-underline">True</property>
-                            <property name="draw-indicator">True</property>
-                            <signal name="toggled" handler="on_extensions_check_toggled" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkCheckButton" id="autopreview_check">
-                            <property name="label" translatable="yes">Preview automatically</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="receives-default">False</property>
-                            <property name="use-underline">True</property>
-                            <property name="draw-indicator">True</property>
-                            <signal name="toggled" handler="on_autopreview_check_toggled" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">4</property>
-                          </packing>
-                        </child>
                       </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="add_recursive">
+                        <property name="label" translatable="yes">Add files recursively</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="use-underline">True</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_add_recursive_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="extensions_check">
+                        <property name="label" translatable="yes">Keep extensions</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="use-underline">True</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_extensions_check_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="autopreview_check">
+                        <property name="label" translatable="yes">Preview automatically</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="use-underline">True</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_autopreview_check_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">4</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -1078,7 +1072,7 @@ ____ to _
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=3 n-rows=2 -->
+                  <!-- n-columns=2 n-rows=3 -->
                   <object class="GtkGrid" id="manual_table">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1135,16 +1129,15 @@ ____ to _
                         <property name="xalign">0</property>
                       </object>
                       <packing>
-                        <property name="left-attach">2</property>
-                        <property name="top-attach">0</property>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">2</property>
+                        <property name="width">2</property>
                       </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                   </object>
                   <packing>
                     <property name="position">3</property>
+                    <property name="tab-fill">False</property>
                   </packing>
                 </child>
                 <child type="tab">
@@ -1584,7 +1577,7 @@ ____ to _
               </packing>
             </child>
             <child>
-              <!-- n-columns=3 n-rows=3 -->
+              <!-- n-columns=3 n-rows=2 -->
               <object class="GtkGrid" id="table1">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -1744,15 +1737,6 @@ ____ to _
                     <property name="left-attach">1</property>
                     <property name="top-attach">1</property>
                   </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
                 </child>
               </object>
               <packing>
