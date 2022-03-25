@@ -336,18 +336,20 @@ class pyRenamer:
             str, str, str, str, GdkPixbuf.Pixbuf)
         self.selected_files.set_model(self.file_selected_model)
 
-        renderer0 = Gtk.CellRendererPixbuf()
-        column0 = Gtk.TreeViewColumn('', renderer0, pixbuf=4)
+        #renderer0 = Gtk.CellRendererPixbuf()
+        #column0 = Gtk.TreeViewColumn('', renderer0, pixbuf=4)
+        #self.selected_files.append_column(column0)
+
+        renderer0 = Gtk.CellRendererText()
+        column0 = Gtk.TreeViewColumn("Original File Name", renderer0, text=0)
+        column0.set_resizable(True)
         self.selected_files.append_column(column0)
 
         renderer1 = Gtk.CellRendererText()
-        column1 = Gtk.TreeViewColumn("Original file name", renderer1, text=0)
+        column1 = Gtk.TreeViewColumn("Renamed File Name", renderer1, text=2)
+        column1.set_resizable(True)
+        self.column_preview = column1
         self.selected_files.append_column(column1)
-
-        renderer2 = Gtk.CellRendererText()
-        column2 = Gtk.TreeViewColumn("Renamed file name", renderer2, text=2)
-        self.column_preview = column2
-        self.selected_files.append_column(column2)
 
         self.selected_files.show()
 
