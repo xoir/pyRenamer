@@ -265,11 +265,11 @@ class pyRenamer:
         file_browser_scrolled = self.file_browser.get_scrolled()
         signal = self.file_browser.connect("cursor-changed", self.dir_selected)
 
-        # Add dirs and files tomain window
-        self.builder.get_object('main_hpaned').pack1(
-            file_browser_scrolled, resize=True, shrink=False)
-        self.builder.get_object('main_hpaned').pack2(
-            selected_files_scrolled, resize=True, shrink=False)
+        # Add dirs and files to main window
+        self.builder.get_object('browser_box').pack_end(
+            file_browser_scrolled, True, True, 0)
+        self.builder.get_object('rename_box').pack_end(
+            selected_files_scrolled, True, True, 0)
 
         # Create model and add dirs
         self.create_model()
