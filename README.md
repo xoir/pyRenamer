@@ -2,7 +2,7 @@
 
 pyRenamer is an application with a graphic interface designed for renaming many files at once. It supports renaming files with patterns, substitutions, inserting text, deleting text, or even manually renaming individual files. 
 
-[](./screenshots/screenshot.png)
+![screenshot](screenshots/screenshot.png)
 
 ## Requirements
 - python3
