@@ -44,6 +44,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 import threading
@@ -1138,12 +1139,12 @@ class pyRenamer:
 
         self.stop_button.hide()
         for i in self.populate_id:
-            removed = GObject.source_remove(i)
+            removed = GLib.source_remove(i)
             self.populate_id.remove(i)
 
-        self.selected_files.set_model(self.file_selected_model)
-        self.progressbar.set_fraction(0)
-        self.builder.get_object('statusbar').push(self.statusbar_context, ("Directory: %s - Files: %s") % (self.active_dir, self.count))
+            self.selected_files.set_model(self.file_selected_model)
+            self.progressbar.set_fraction(0)
+            self.builder.get_object('statusbar').push(self.statusbar_context, ("Directory: %s - Files: %s") % (self.active_dir, self.count))
 
 
     def populate_get_listing(self, dir, pattern, recursive):
