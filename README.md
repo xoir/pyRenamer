@@ -1,28 +1,18 @@
-#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
-#+options: author:t broken-links:nil c:nil creator:nil
-#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:nil
-#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
-#+options: timestamp:t title:t toc:t todo:t |:t
-#+title: pyRenamer
-#+date: <2022-01-11 Tue>
-#+author: Thomas Freeman
-#+language: en
-#+select_tags: export
-#+exclude_tags: noexport
-#+creator: Emacs 27.1 (Org mode 9.4.6)
-#+cite_export:
+# pyRenamer
 
 pyRenamer is an application with a graphic interface designed for renaming many files at once. It supports renaming files with patterns, substitutions, inserting text, deleting text, or even manually renaming individual files. 
 
-[[file:./screenshots/screenshot.png]]
+[](./screenshots/screenshot.png)
 
-* Requirements
+## Requirements
 - python3
 - python3-gobject-base
 
-* Usage
+## Usage
+
 While pyRenamer is designed to be a graphical program, it can also be called from the command line. Here are the command line options:
-#+begin_example
+
+```
 python3 pyrenamer.py [-h] [-r ROOT_DIR] [-a ACTIVE_DIR]
 
 optional arguments:
@@ -33,9 +23,9 @@ optional arguments:
   -a ACTIVE_DIR, --active_dir ACTIVE_DIR
                         Directory with files to be renamed when pyRenamer
                         starts
-#+end_example
+```
 
-* Website
+## Website
 Check the following website for more information on pyRenamer:
 
  http://tfree87.github.io/pyRenamer/
