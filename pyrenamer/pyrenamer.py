@@ -317,7 +317,7 @@ class pyRenamer:
         view.set_headers_visible(True)
         view.set_enable_search(True)
         view.set_reorderable(False)
-        view.set_rules_hint(True)
+
         view.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         view.connect("cursor-changed", self.on_selected_files_cursor_changed)
 
