@@ -316,7 +316,10 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     newname = newname.replace("{dir}", dir)
 
     # Some date replacements
-    newname = newname.replace("{date}", time.strftime("%d%b%Y", time.localtime()))
+    newname = newname.replace("{date}", time.strftime("%Y%m%d", time.localtime()))
+    newname = newname.replace(
+        "{datedelim}", time.strftime("%Y-%m-%d", time.localtime())
+    )
     newname = newname.replace("{year}", time.strftime("%Y", time.localtime()))
     newname = newname.replace("{month}", time.strftime("%m", time.localtime()))
     newname = newname.replace("{monthname}", time.strftime("%B", time.localtime()))
@@ -328,7 +331,7 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     # Some pattern matches for creation and modification date
     createdate, modifydate = get_filestat_data(get_new_path(name, path))
     if createdate is not None:
-        newname = newname.replace("{createdate}", time.strftime("%d%b%Y", createdate))
+        newname = newname.replace("{createdate}", time.strftime("%Y%m%d", createdate))
         newname = newname.replace("{createyear}", time.strftime("%Y", createdate))
         newname = newname.replace("{createmonth}", time.strftime("%m", createdate))
         newname = newname.replace("{createmonthname}", time.strftime("%B", createdate))
