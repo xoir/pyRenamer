@@ -659,14 +659,13 @@ class pyRenamer:
             self.builder.get_object("options_label").show()
             icon = self.builder.get_object("options_button").get_child()
             icon.set_from_icon_name(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
+            self.options_shown = True
         else:
             self.builder.get_object("options_vbox").hide()
             self.builder.get_object("options_label").hide()
             icon = self.builder.get_object("options_button").get_child()
             icon.set_from_icon_name(Gtk.STOCK_PREFERENCES, Gtk.IconSize.MENU)
-
-            self.options_shown = state
-            self.builder.get_object("menu_show_options").set_active(state)
+            self.options_shown = False
 
     def on_file_pattern_changed(self, widget):
         """Reload the current dir 'cause we need it"""
@@ -1122,7 +1121,7 @@ class pyRenamer:
 
     def initialize_defaults(self):
         self.options_panel_state(self.options_shown)
-        self.builder.get_object("menu_show_options").set_active(self.options_shown)
+        # self.builder.get_object("menu_show_options").set_active(self.options_shown)
         self.builder.get_object("filedir_combo").set_active(self.filedir)
         self.builder.get_object("add_recursive").set_active(self.recursive)
         self.builder.get_object("extensions_check").set_active(self.keepext)
