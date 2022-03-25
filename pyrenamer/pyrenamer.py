@@ -638,15 +638,15 @@ class pyRenamer:
             self.builder.get_object('options_vbox').show()
             self.builder.get_object('options_label').show()
             icon = self.builder.get_object('options_button').get_child()
-            icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
+            icon.set_from_icon_name(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
         else:
             self.builder.get_object('options_vbox').hide()
             self.builder.get_object('options_label').hide()
             icon = self.builder.get_object('options_button').get_child()
-            icon.set_from_stock(Gtk.STOCK_PREFERENCES, Gtk.IconSize.MENU)
+            icon.set_from_icon_name(Gtk.STOCK_PREFERENCES, Gtk.IconSize.MENU)
 
-        self.options_shown = state
-        self.builder.get_object('menu_show_options').set_active(state)
+            self.options_shown = state
+            self.builder.get_object('menu_show_options').set_active(state)
 
     def on_file_pattern_changed(self, widget):
         """ Reload the current dir 'cause we need it """
