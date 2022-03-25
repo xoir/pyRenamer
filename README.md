@@ -4,6 +4,11 @@ pyRenamer is an application with a graphic interface designed for renaming many 
 
 ![screenshot](screenshots/screenshot.png)
 
+## Similar Projects
+Note: This project is **not** the same as the following projects:
+- pyRenamer: https://github.com/lucasbarzan/py-renamer
+- pyrename: https://github.com/sgtpepperpt/pyrename
+
 ## Requirements
 - python3
 - python3-gobject-base
