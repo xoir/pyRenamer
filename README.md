@@ -24,8 +24,3 @@ optional arguments:
                         Directory with files to be renamed when pyRenamer
                         starts
 ```
-
-## Website
-Check the following website for more information on pyRenamer:
-
- http://tfree87.github.io/pyRenamer/
