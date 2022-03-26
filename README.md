@@ -4,7 +4,23 @@ pyRenamer is an application with a graphic interface designed for renaming many 
 
 ![screenshot](screenshots/screenshot.png)
 
+## Features
+
+Currently, pyRenamer implements the following features:
+- Change or keep file extensions when renaming (in options pane)
+- Rename files based on patterns in the original file name (e.g. files named 1-a.txt could be changed to a-1.txt using a pattern {#}-{X}.txt)
+- Insert characters into a file name
+- Delete characters in a file name
+- Replace matching characters in a file name
+- Replace accented characters with non-accented characters
+- Change the capitalization of file names
+- Change spaces, dots, and dashes in file names
+- Remove duplicated symbols in file names
+- Manually rename single files
+- Show a preview of the file name changes before renaming the files
+
 ## Similar Projects
+
 Note: This project is **not** the same as the following projects:
 - pyRenamer: https://github.com/lucasbarzan/py-renamer
 - pyrename: https://github.com/sgtpepperpt/pyrename
