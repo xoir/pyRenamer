@@ -378,6 +378,8 @@ class pyRenamer:
         """Called when Preview button is clicked.
         Get new names and paths and add it to the model"""
 
+        ext = ""
+
         if (paths != None) and (path not in paths) and (paths != []):
             # Preview only selected rows (if we're not on manual rename)
             return
@@ -403,9 +405,14 @@ class pyRenamer:
             pattern_end = self.builder.get_object(
                 "renamed_pattern_combo"
             ).get_active_text()
-            newname, newpath = renamerfilefuncs.rename_using_patterns(
-                newname, newpath, pattern_ini, pattern_end, self.count
-            )
+            if self.keepext:
+                newname, newpath = renamerfilefuncs.rename_using_patterns(
+                    newname, newpath, pattern_ini, pattern_end, self.count, ext=ext
+                )
+            else:
+                newname, newpath = renamerfilefuncs.rename_using_patterns(
+                    newname, newpath, pattern_ini, pattern_end, self.count
+                )
 
         elif self.builder.get_object("notebook").get_current_page() == 1:
             # Replace spaces

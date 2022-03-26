@@ -242,7 +242,7 @@ def replace_duplicated(name, path):
     return str(newname), str(newpath)
 
 
-def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
+def rename_using_patterns(name, path, pattern_ini, pattern_end, count, ext=""):
     """This method parses te patterns given by the user and stores the new filename
     on the treestore. Posibble patterns are:
 
@@ -254,6 +254,7 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     """
     name = str(name)
     path = str(path)
+    ext = ext
 
     pattern = pattern_ini
     newname = pattern_end
@@ -329,7 +330,10 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count):
     newname = newname.replace("{daysimp}", time.strftime("%a", time.localtime()))
 
     # Some pattern matches for creation and modification date
-    createdate, modifydate = get_filestat_data(get_new_path(name, path))
+    if ext:
+        createdate, modifydate = get_filestat_data(get_new_path(name + "." + ext, path))
+    else:
+        createdate, modifydate = get_filestat_data(get_new_path(name, path))
     if createdate is not None:
         newname = newname.replace("{createdate}", time.strftime("%Y%m%d", createdate))
         newname = newname.replace("{createyear}", time.strftime("%Y", createdate))
