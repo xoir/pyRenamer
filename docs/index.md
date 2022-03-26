@@ -1,4 +1,4 @@
-# <img src="/pyRenamer/assets/pyrenamer.png" alt="icon" width="50"/> Welcome
+# <img src="/pyRenamer/assets/images/pyrenamer.png" alt="icon" width="50"/> Welcome
 
 Welcome to the homepage for pyRenamer!
 
@@ -7,7 +7,7 @@ https://github.com/tfree87/pyRenamer
 
 # Screenshot
 
-![screenshot](/pyRenamer/assets/screenshot.png)
+![screenshot](/pyRenamer/assets/images/screenshot.png)
 
 # Features
 
