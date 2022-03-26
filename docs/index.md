@@ -1,6 +1,6 @@
 # <img src="pyrenamer.png" alt="icon" width="50"/> Welcome
 
-!Welcome to the homepage for pyRenamer!
+Welcome to the homepage for pyRenamer!
 
 This page is currently under construction. If you would like to learn more about pyRenamer please checkout README.md on the Github page for the moment:
 https://github.com/tfree87/pyRenamer
