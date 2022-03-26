@@ -336,6 +336,9 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count, ext=""):
         createdate, modifydate = get_filestat_data(get_new_path(name, path))
     if createdate is not None:
         newname = newname.replace("{createdate}", time.strftime("%Y%m%d", createdate))
+        newname = newname.replace(
+            "{createdatedelim}", time.strftime("%Y-%m-%d", createdate)
+        )
         newname = newname.replace("{createyear}", time.strftime("%Y", createdate))
         newname = newname.replace("{createmonth}", time.strftime("%m", createdate))
         newname = newname.replace("{createmonthname}", time.strftime("%B", createdate))
@@ -345,6 +348,7 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count, ext=""):
         newname = newname.replace("{createdaysimp}", time.strftime("%a", createdate))
     else:
         newname = newname.replace("{createdate}", "")
+        newname = newname.replace("{createdatedelim}", "")
         newname = newname.replace("{createyear}", "")
         newname = newname.replace("{createmonth}", "")
         newname = newname.replace("{createmonthname}", "")
@@ -354,7 +358,10 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count, ext=""):
         newname = newname.replace("{createdaysimp}", "")
 
     if modifydate is not None:
-        newname = newname.replace("{modifydate}", time.strftime("%d%b%Y", modifydate))
+        newname = newname.replace("{modifydate}", time.strftime("%Y%m%d", modifydate))
+        newname = newname.replace(
+            "{modifydatedelim}", time.strftime("%Y-%m-%d", modifydate)
+        )
         newname = newname.replace("{modifyyear}", time.strftime("%Y", modifydate))
         newname = newname.replace("{modifymonth}", time.strftime("%m", modifydate))
         newname = newname.replace("{modifymonthname}", time.strftime("%B", modifydate))
@@ -364,6 +371,7 @@ def rename_using_patterns(name, path, pattern_ini, pattern_end, count, ext=""):
         newname = newname.replace("{modifydaysimp}", time.strftime("%a", modifydate))
     else:
         newname = newname.replace("{modifydate}", "")
+        newname = newname.replace("{modifydatedelim}", "")
         newname = newname.replace("{modifyyear}", "")
         newname = newname.replace("{modifymonth}", "")
         newname = newname.replace("{modifymonthname}", "")
