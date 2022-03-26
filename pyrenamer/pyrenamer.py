@@ -261,7 +261,6 @@ class pyRenamer:
 
         # Init main window
         self.builder.get_object("main_window").set_title("pyRenamer")
-        self.builder.get_object("main_window").set_has_resize_grip(True)
         self.builder.get_object("main_window").set_icon_from_file(self.icon)
 
         # Init TreeFileBrowser
@@ -1170,7 +1169,7 @@ class pyRenamer:
         renamerfilefuncs.set_stop(True)
 
         if self.listing_thread != None:
-            while self.listing_thread.isAlive():
+            while self.listing_thread.is_alive():
                 self.listing_thread.join()
 
         self.stop_button.hide()
