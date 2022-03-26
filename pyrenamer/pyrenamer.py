@@ -1195,7 +1195,7 @@ class pyRenamer:
         else:
             self.listing = renamerfilefuncs.get_file_listing(dir, self.filedir, pattern)
 
-        GObject.idle_add(self.populate_get_listing_end)
+        GLib.idle_add(self.populate_get_listing_end)
 
     def populate_get_listing_end(self):
         """The listing thread stuff is over, so now add things to the view"""
@@ -1204,7 +1204,7 @@ class pyRenamer:
             self.populate_stop()
         else:
             populate = self.populate_add_to_view(self.listing)
-            self.populate_id.append(GObject.idle_add(populate.__next__))
+            self.populate_id.append(GLib.idle_add(populate.__next__))
 
     def populate_selected_files(self, dir):
         """Get the file listing using the utilities on renamerfilefuncs.
