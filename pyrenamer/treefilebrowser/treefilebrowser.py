@@ -502,6 +502,6 @@ class TreeFileBrowser(GObject.GObject):
         return view, scrolled
 
 
-    GObject.type_register(TreeFileBrowser)
+GObject.type_register(TreeFileBrowser)
 
 # End TreeFileBrowser
