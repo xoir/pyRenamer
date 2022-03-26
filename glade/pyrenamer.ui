@@ -692,7 +692,8 @@ Use {num2+10} for 010, 011, 012...
 Use {dir} for getting current dir
 
 Some today date replacements:
-{date}			22feb1980
+{date}			19800222
+{datedelim}		1980-02-22
 {year}			1980
 {month}		02
 {monthname}	february
