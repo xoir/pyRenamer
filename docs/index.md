@@ -1,4 +1,4 @@
-# <img src="images/pyrenamer.png" alt="icon" width="50"/> Welcome
+# <img src="../images/pyrenamer.png" alt="icon" width="50"/> Welcome
 
 !Welcome to the homepage for pyRenamer!
 
