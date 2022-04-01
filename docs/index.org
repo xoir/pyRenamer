@@ -1,0 +1,60 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+
+#+options: html-link-use-abs-url:nil html-postamble:auto
+#+options: html-preamble:t html-scripts:nil html-style:t
+#+options: html5-fancy:nil tex:t
+#+html_doctype: xhtml-strict
+#+html_container: div
+#+html_content_class: content
+#+description:
+#+keywords:
+#+html_link_home:
+#+html_link_up:
+#+html_mathjax:
+#+html_equation_reference_format: \eqref{%s}
+#+html_head:
+#+html_head_extra:
+#+subtitle:
+#+infojs_opt:
+#+creator: <a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="https://orgmode.org">Org</a> mode 9.5.2)
+#+latex_header:
+
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: pyRenamer
+#+date: <2022-03-31 Thu>
+#+author:
+#+email: 
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 27.2 (Org mode 9.5.2)
+#+cite_export:
+
+#+attr_html: :width 50px
+[[./img/pyrenamer.png]] Welcome to the homepage for pyRenamer! A tool to rename many files simultaneously.
+
+This page is currently under construction. If you would like to learn more about pyRenamer please checkout README.md on the Github page for the moment:
+https://github.com/tfree87/pyRenamer
+
+* Screenshot
+
+[[./img/screenshot.png]]
+
+* Features
+
+pyRenamer lets you change the names of many files at once along with:
+- Change or keep file extensions when renaming (in options pane)
+- Rename files based on patterns in the original file name (e.g. files named 1-a.txt could be changed to a-1.txt using a pattern {#}-{X}.txt)
+- Insert characters into a file name
+- Delete characters in a file name
+- Replace matching characters in a file name
+- Replace accented characters with non-accented characters
+- Change the capitalization of file names
+- Change spaces, dots, and dashes in file names
+- Remove duplicated symbols in file names
+- Manually rename single files
+- Show a preview of the file name changes before renaming the files
