@@ -66,7 +66,7 @@ from tools import filetools as renamerfilefuncs
 from tools import undo
 
 
-config_dir = os.path.join(os.path.expanduser("~"), "config/pyRenamer")
+config_dir = os.path.join(os.path.expanduser("~"), ".config/pyRenamer")
 
 
 class pyRenamer:
