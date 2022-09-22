@@ -29,6 +29,23 @@ Note: This project is **not** the same as the following projects:
 - python3
 - python3-gobject-base
 
+## Install using a conda environment
+Conda allows creating a python environment without changing your python system installation and packages. Also, allow distros compatibility since libraries and packages can be named differently across Linux distributions. Also, allows setting the libraries versions to be used with the distributed python software.
+
+Assuming you have installed conda or miniconda python package manager in your system ([if not click here to see how](https://docs.conda.io/en/latest/miniconda.html)]
+
+```
+# Clonning the PyRenamer repo
+git clone https://github.com/tfree87/pyRenamer
+# Enter to the pyRenamer folder
+cd pyRenamer
+# Create a conda environment with the packages needed by pyRenamer
+conda env create -f pyRenamer-environment.yml
+# Activate the Conda Python enviroment
+conda activate pyRenamer
+# Run pyRenamer
+python3 pyrenamer/pyrenamer.py
+```
 ## Usage
 
 While pyRenamer is designed to be a graphical program, it can also be called from the command line. Here are the command line options:
